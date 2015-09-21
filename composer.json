@@ -1,0 +1,17 @@
+{
+    "name": "xandros/saya",
+    "description": "PHP irc bot",
+    "type": "project",
+    "license": "BDSL",
+    "authors": [
+        {
+            "name": "Remigiusz Guszkiewicz",
+            "email": "xandros92@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+         "php": ">=5.4.0",
+         "symfony/process": "*"
+    }
+}

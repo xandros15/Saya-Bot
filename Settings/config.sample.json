@@ -1,0 +1,27 @@
+{
+    "server": "irc.freenode.net",
+    "port": 6667,
+    "personal": {
+        "name": "Natsume",
+        "nick": "tokido_saya",
+        "password": "",
+        "identify": ""
+    },
+    "permit": [
+        ""
+    ],
+    "channels": [
+        "#xandrosdev"
+    ],
+    "logFolder": "log",
+    "modules": [
+        "Basic",
+        "Commands",
+        "Chatlog",
+        "Url",
+        "Fun"
+    ]
+}
+
+
+    
