@@ -2,6 +2,9 @@
 
 namespace Library;
 
+use Library\Chatter\Chat;
+use Library\Chatter\MessageRelay;
+
 class Server implements BotInterface\Server
 {
     public $name;
@@ -9,11 +12,14 @@ class Server implements BotInterface\Server
     public $ports;
     public $password;
     
-    private $chat;
+    public $chat;
+    
+    private $messageRelay;
 
     public function __construct()
     {
-        $this->chat = new Chat();
+        $this->messageRelay = new MessageRelay();
+        $this->chat = new Chat($this->messageRelay);
     }
 
     public function setName($name)
@@ -66,8 +72,9 @@ class Server implements BotInterface\Server
         
     }
 
-    public function loadData($data)
+    public function loadData($message)
     {
-        return $this->chat->setIncommingData($data);
+        $this->messageRelay->setMessage($message);
+        return $this->chat->update();
     }
 }
