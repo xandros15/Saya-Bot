@@ -4,7 +4,7 @@ namespace Library\Chatter;
 
 use Library\Configuration as Config;
 
-class Chat implements Chatter
+class Textline implements \Library\BotInterface\Chatter
 {
     const MESSAGE_REGEX = '~^(?:[:](\S+) )?(\S+)(?: (?!:)(.+?))?(?: [:](.+))?$~';
     const MASK_REGEX = '/^(?:(\S+)!~?(\S+)\@)?(\S+)$/';
@@ -31,10 +31,11 @@ class Chat implements Chatter
         if (!preg_match(self::MESSAGE_REGEX, $message, $data)) {
             return false;
         }
-        $this->setUser($data[1]);
-        $this->setType($data[2]);
-        $this->setMessage($data[4]);
-        $this->setSource($data[3]);
+        !isset($data[1]) or $this->setUser($data[1]);
+        !isset($data[2]) or $this->setType($data[2]);
+        !isset($data[3]) or $this->setSource($data[3]);
+        !isset($data[4]) or $this->setMessage($data[4]);
+        
         return true;
     }
 
@@ -81,7 +82,7 @@ class Chat implements Chatter
     private function setUser($data)
     {
         $user = (!empty($data)) ? $data : false;
-        if (!$mask && preg_match(self::MASK_REGEX, $mask, $maskMatch)) {
+        if ($user && preg_match(self::MASK_REGEX, $user, $maskMatch)) {
             $this->userNick = (!empty($maskMatch[1])) ? $maskMatch[1] : false;
             $this->userName = (!empty($maskMatch[2])) ? $maskMatch[2] : false;
             $this->userHost = (!empty($maskMatch[3])) ? $maskMatch[3] : false;
