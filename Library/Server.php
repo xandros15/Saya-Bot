@@ -2,39 +2,46 @@
 
 namespace Library;
 
-use Library\Chatter\Chat;
+use Library\Chatter\Textline;
 use Library\Chatter\MessageRelay;
+use Library\Connection\Socket;
+use Library\Helper\ServerHelper;
 
-class Server implements BotInterface\Server
+class Server implements BotInterface\ServerController
 {
-    public $name;
-    public $dns;
-    public $ports;
-    public $password;
-    
-    public $chat;
-    
+    const NUMBER_OF_RECONNECTS = 10;
+
+    private $name;
+    private $host;
+    private $ports;
+    private $password;
+    private $textline;
+    private $connection;
     private $messageRelay;
 
     public function __construct()
     {
         $this->messageRelay = new MessageRelay();
-        $this->chat = new Chat($this->messageRelay);
+        $this->textline = new Textline($this->messageRelay);
+        $this->connection = new Socket();
     }
 
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
-    public function setDns($dns)
+    public function setHost($host)
     {
-        $this->dns = $dns;
+        $this->host = $host;
+        return $this;
     }
 
     public function setPorts($ports)
     {
         $this->ports = $ports;
+        return $this;
     }
 
     public function getName()
@@ -42,9 +49,9 @@ class Server implements BotInterface\Server
         return $this->name;
     }
 
-    public function getDns()
+    public function getHost()
     {
-        return $this->dns;
+        return $this->host;
     }
 
     public function getPorts()
@@ -57,24 +64,62 @@ class Server implements BotInterface\Server
         return $this->password;
     }
 
-    public function getChat()
+    public function getTextline()
     {
-        return $this->chat;
+        return $this->textline;
     }
 
-    public function connectToServer()
+    public function sendData($data)
     {
-        
+        return $this->connection->sendData($data . IRC_EOL);
     }
 
-    public function disconnectFromServer()
+    public function connect()
     {
-        
+        $ports = ServerHelper::parsePorts($this->getPorts());
+        $nrOfPorts = count($ports);
+        $portKey = 0;
+        $try = self::NUMBER_OF_RECONNECTS;
+        while (($try--)) {
+            $port = $ports[$portKey];
+            $this->connection->connect($this->getHost(), $port);
+            if ($this->connection->isConnected()) {
+                return true;
+            }
+            if(++$portKey > ($nrOfPorts - 1)){
+                $portKey = 0;
+            }
+            sleep(1 + self::NUMBER_OF_RECONNECTS - $try);
+        }
+        //TODO add error
+        return false;
     }
 
-    public function loadData($message)
+    public function isConnected()
     {
+        return $this->connection->isConnected();
+    }
+
+    public function disconnect($force = false)
+    {
+        $this->connection->disconnect((bool) $force);
+        return $this;
+    }
+
+    public function loadData()
+    {
+        $data = $this->connection->getData();
+        if (!$data) {
+            return false;
+        }
+
+        $signsToDelete = [chr(9), chr(10), chr(11), chr(13), chr(0)];
+        $message = trim(str_replace($signsToDelete, '', $data));
+
+        if (!$message) {
+            return false;
+        }
         $this->messageRelay->setMessage($message);
-        return $this->chat->update();
+        return $this->textline->update();
     }
 }
