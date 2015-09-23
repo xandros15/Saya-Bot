@@ -2,46 +2,69 @@
 
 namespace Library\Connection;
 
-use Exception;
-
 class Socket implements \Library\BotInterface\Connection
 {
-    const
-        NUMBER_OF_RECONNECTS = 10;
-    
-    private
-        $server = '',
-        $port = 0,
-        $socket = null;
+    private $socket;
+    private $host;
+    private $port;
 
     public function __destruct()
     {
         $this->disconnect();
     }
 
-    public function connect()
+    public function getHost()
     {
-        $port = $this->port;
-        $server = $this->server;
-        $try = self::NUMBER_OF_RECONNECTS;
-        do {
-            $this->socket = stream_socket_client($server . ':' . $port++);
-        } while ($try-- > 0 && !$this->isConnected() && !sleep(1));
-        if (!$this->isConnected()) {
-            throw new Exception("Unable to connect to server via fsockopen with server: \"{$this->server}\" and port: \"{$this->port}\"");
+        return $this->host;
+    }
+
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    public function connect($host, $port)
+    {
+        if (strpos($host, ':') !== false) {
+            $host = '[' . $host . ']';
         }
-        stream_set_blocking($this->socket, 0);
-        stream_set_timeout($this->socket, 360);
+
+        $dns = sprintf('tcp://%s:%d', $host, $port);
+
+        $socket = @stream_socket_client($dns, $errno, $errstr, 1);
+        //TODO error holder
+        if ($socket === false) {
+            return false;
+        }
+
+        stream_set_blocking($socket, false);
+
+        $this->port = (int) $port;
+        $this->host = (string) $host;
+        $this->socket = $socket;
+        return true;
     }
 
     public function disconnect()
     {
-        return ($this->socket) ? fclose($this->socket) : false;
+        if (!is_resource($this->socket)) {
+            return false;
+        }
+        stream_socket_shutdown($this->socket, STREAM_SHUT_RDWR);
+        stream_set_blocking($this->socket, false);
+        fclose($this->socket);
+        return true;
+    }
+
+    public function isConnected()
+    {
+        $socket = $this->socket;
+        return (!is_resource($socket)) ? false : (!feof($socket));
     }
 
     public function sendData($data)
     {
-        return fwrite($this->socket, $data, 510);
+        return fwrite($this->socket, $data, strlen($data));
     }
 
     public function getData()
@@ -49,18 +72,9 @@ class Socket implements \Library\BotInterface\Connection
         return fgets($this->socket, 512);
     }
 
-    public function isConnected()
+    public function setTimeout($seconds)
     {
-        return (is_resource($this->socket)) ? true : false;
-    }
-
-    public function setServer($server)
-    {
-        $this->server = (string) $server;
-    }
-
-    public function setPort($port)
-    {
-        $this->port = (int) $port;
+        stream_set_timeout($this->socket, $seconds);
+        return $this;
     }
 }
