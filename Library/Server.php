@@ -76,6 +76,9 @@ class Server implements BotInterface\ServerController
 
     public function connect()
     {
+        if ($this->connection->isConnected()) {
+            $this->connection->disconnect();
+        }
         $ports = ServerHelper::parsePorts($this->getPorts());
         $nrOfPorts = count($ports);
         $portKey = 0;
