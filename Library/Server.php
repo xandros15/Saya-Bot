@@ -89,7 +89,7 @@ class Server implements BotInterface\ServerController
             if ($this->connection->isConnected()) {
                 return true;
             }
-            if(++$portKey > ($nrOfPorts - 1)){
+            if (++$portKey > ($nrOfPorts - 1)) {
                 $portKey = 0;
             }
             sleep(1 + self::NUMBER_OF_RECONNECTS - $try);
