@@ -251,9 +251,11 @@ abstract class Module
                 'verify_peer' => false
             ]
         ];
-        $opts['http']['header'] = (!empty($login)) ? 'Authorization: Basic ' .
-            base64_encode(sprintf("%s:%s", $login['login'], $login['key'])) .
-            "\r\n" . $opts['http']['header'] : $opts['http']['header'];
+        if($login){
+            $auth = sprintf('%s:%s', $login['login'], $login['key']);
+            $encodedAuth = base64_encode($auth);
+            $opts['http']['header'] = $encodedAuth . "\r\n" . $opts['http']['header'];
+        }
 
         $this->ctx = stream_context_create($opts);
     }
@@ -408,26 +410,28 @@ abstract class Module
     {
 
         require_once (implode(DIRECTORY_SEPARATOR, [ROOT_DIR, 'Library', 'database', 'rb.php']));
-        $dbConfig = static::$dbConfig;
-        switch (strtoupper($dbConfig->type)) {
-            case 'SQLITE':
-                $dns = "sqlite:/tmp/{$dbname}.sqlite3";
-                $dbConfig->user = $dbConfig->password = null;
-                break;
-            case 'MARIA':
-                $dns = "mysql:host={$dbConfig->host};dbname={$dbname}";
-                break;
-            case 'POSTGRESQL':
-                $dns = "pgsql:host={$dbConfig->host};dbname={$dbname}";
-                break;
-            case null:
-            default :
-                $dns = null;
-                $dbConfig->user = $dbConfig->password = null;
-        }
         if (isset(R::$toolboxes[$dbname])) {
             R::selectDatabase($dbname);
         } else {
+            $dbConfig = static::$dbConfig;
+            switch (strtoupper($dbConfig->type)) {
+                case 'SQLITE':
+                    $dns = sprintf('sqlite:/tmp/%s.sqlite3', $dbname);
+                    $dbConfig->user = $dbConfig->password = null;
+                    break;
+                case 'MARIA':
+                    $host = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
+                    $dns = sprintf('mysql:host=%s;dbname=%s', $host, $dbname);
+                    break;
+                case 'POSTGRESQL':
+                    $host = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
+                    $dns = sprintf('pgsql:host=%s;dbname=%s', $host, $dbname);
+                    break;
+                case null:
+                default :
+                    $dns = null;
+                    $dbConfig->user = $dbConfig->password = null;
+            }
             R::addDatabase($dbname, $dns, $dbConfig->user, $dbConfig->password, $frozen);
             R::selectDatabase($dbname);
         }

@@ -8,7 +8,7 @@ class Textline implements \Library\BotInterface\Chatter
 {
     const MESSAGE_REGEX = '~^(?:[:](\S+) )?(\S+)(?: (?!:)(.+?))?(?: [:](.+))?$~';
     const MASK_REGEX = '/^(?:(\S+)!~?(\S+)\@)?(\S+)$/';
-    const SOURCE_REGEX = '/(#\w+)/';
+    const SOURCE_REGEX = '/(#[\w-]+)/';
 
     private $user;
     private $message;
@@ -31,11 +31,12 @@ class Textline implements \Library\BotInterface\Chatter
         if (!preg_match(self::MESSAGE_REGEX, $message, $data)) {
             return false;
         }
-        !isset($data[1]) or $this->setUser($data[1]);
-        !isset($data[2]) or $this->setType($data[2]);
-        !isset($data[3]) or $this->setSource($data[3]);
-        !isset($data[4]) or $this->setMessage($data[4]);
-        
+
+        $this->setUser(isset($data[1]) ? $data[1] : null);
+        $this->setType(isset($data[2]) ? $data[2] : null);
+        $this->setSource(isset($data[3]) ? $data[3] : null);
+        $this->setMessage(isset($data[4]) ? $data[4] : null);
+
         return true;
     }
 

@@ -2,9 +2,8 @@
 
 namespace Library;
 
-use Library\Chat;
+use Library\Server;
 use Library\Configuration as Config;
-use Library\Connection\Socket;
 use Library\Filter;
 use Library\Constants\IRC;
 use ReflectionClass;
@@ -20,21 +19,21 @@ class Bot
         $module = [];
     private
         $buffer = [],
-        /** @var \Library\Connection\Socket */
-        $connection = null,
-        /** @var \Library\Chat */
+        /** @var \Library\Chatter\Textline */
         $chat = null,
         $messageToSend = 0,
         $timeLastSend = 0,
+        /** @var \Library\Server */
+        $server,
         $numberOfReconnects = 0;
 
     public function connectToServer()
     {
-        if ($this->connection->isConnected()) {
-            $this->connection->disconnect();
+        if (!$this->server->isConnected()) {
+            if (!$this->server->connect()) {
+                return false;
+            }
         }
-        $this->connection->connect();
-
         $user = IRC::USER . ' ' . Config::$personal->name . ' exsubs.anidb.pl ' . Config::getNick() . ' :' . Config::$personal->name;
         $login = IRC::NICK . ' ' . Config::getNick();
         $auth = (Config::$personal->password) ? IRC::PASSWORD . ' ' . Config::$personal->password : false;
@@ -43,6 +42,7 @@ class Bot
         }
         $this->sendDataToServer($login);
         $this->sendDataToServer($user);
+        return true;
     }
 
     public function fillBuffer($text, $type, $target = null, $prio = false)
@@ -96,7 +96,7 @@ class Bot
                     $message = IRC::JOIN . ' ' . $text;
                     break;
                 case IRC::KICK:
-                    $message = IRC::KICK . ' ' . $target . ' ' . $text;
+                    $message = IRC::KICK . ' ' . $target . ' :' . $text;
                     break;
                 case IRC::NOTICE:
                     $message = IRC::NOTICE . ' ' . $target . ' :' . $text;
@@ -130,42 +130,42 @@ class Bot
 
     public function getMask()
     {
-        return $this->chat->mask;
+        return $this->chat->getUser();
     }
 
     public function getType()
     {
-        return $this->chat->type;
+        return $this->chat->getType();
     }
 
     public function getSource()
     {
-        return $this->chat->source;
+        return $this->chat->getSource();
     }
 
     public function getOffset()
     {
-        return $this->chat->offset;
+        return $this->chat->getOffset();
     }
 
     public function getMessage()
     {
-        return $this->chat->message;
+        return $this->chat->getMessage();
     }
 
     public function getUserNick()
     {
-        return $this->chat->userNick;
+        return $this->chat->getUserNick();
     }
 
     public function getUserName()
     {
-        return $this->chat->userName;
+        return $this->chat->getUserName();
     }
 
     public function getUserHost()
     {
-        return $this->chat->userHost;
+        return $this->chat->getUserHost();
     }
 
     public function startBot()
@@ -180,8 +180,7 @@ class Bot
         if (stripos($data, $error = 'Registration Timeout') !== false) {
             die($error . PHP_EOL);
         }
-        if ($this->connection->isConnected() == false ||
-            stripos($data, 'Closing Link') !== false) {
+        if (stripos($data, 'Closing Link') !== false) {
             sleep(10 * $this->numberOfReconnects++);
             $this->connectToServer();
         }
@@ -213,58 +212,64 @@ class Bot
     {
         $namespace = 'Module';
         foreach ($module as $moduleName) {
-            echo 'load ' . $moduleName . ' module... ';
+            echo 'load ' . $moduleName . ' module... '; //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
             $reflector = new ReflectionClass("{$namespace}\\{$moduleName}");
             $instance = $reflector->newInstance();
             $name = $reflector->getShortName();
             if (!$instance instanceof \Library\Module) {
-                throw new Exception;
+                throw new Exception();
             }
             $this->module[$name] = $instance;
             $this->module[$name]->setIRCBot($this);
             $this->module[$name]->loadSettings();
-            echo 'done' . PHP_EOL;
+            echo 'done' . PHP_EOL; //fwrite(STDOUT, 'done' . PHP_EOL);
         }
     }
 
     private function main()
     {
+        do {
+            while ($this->server->isConnected()) {
+                if (!empty($this->buffer)) {
+                    $this->flushBuffer();
+                }
+                if (!$this->server->loadData()) {
+                    if ($this->channelList) {
+                        Module::executeListener();
+                    }
+                    sleep(1);
+                    continue;
+                }
 
-        while (1) {
-            $data = trim(str_replace([chr(9), chr(10), chr(11), chr(13), chr(0)], '', $this->connection->getData()));
-            $this->checkStatus($data);
-            if (!empty($this->buffer)) {
-                $this->flushBuffer();
-            }
-            if (empty($data) || !$this->chat->setIncommingData((string) $data)) {
-                if ($this->channelList) {
-                    Module::executeListener();
-                }
-                sleep(1);
-                continue;
-            }
-            
-            foreach ($this->module as $module) {
-                $module->execute();
-                if (strpos($this->getMessage(), Config::$commandPrefix) === 0) {
-                    $module->executeCommand();
+                foreach ($this->module as $module) {
+                    $module->execute();
+                    if (strpos($this->getMessage(), Config::$commandPrefix) === 0) {
+                        $module->executeCommand();
+                    }
                 }
             }
-        }
+        } while ($this->connectToServer());
+        die('RIP' . PHP_EOL);
     }
 
     private function sendDataToServer($data)
     {
-        $this->connection->sendData($data . IRC_EOL);
+        $this->server->sendData($data);
     }
 
     private function setupBot()
     {
         (new Config())->simpleConfiguration();
-        $this->connection = new Socket();
-        $this->connection->setServer(Config::$server);
-        $this->connection->setPort(Config::$port);
-        $this->chat = new Chat($this);
+
+        $server = new Server();
+        $server->getTextline();
+        $server->setHost(Config::$server);
+        $server->setPorts(Config::$port);
+        $this->chat = $server->getTextline();
+        $this->server = $server;
         $this->loadModule(Config::$modules);
+        if (!$server->connect()) {
+            die();
+        }
     }
 }

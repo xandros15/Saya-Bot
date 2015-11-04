@@ -39,11 +39,18 @@ class Basic extends \Library\Module
         $this->on(IRC::RplNamReply, 'addNickToChannel');
         $this->on(IRC::RplEndOfNames, 'addNickToChannel', [true]);
         $this->on(IRC::ErrBannedFromChan, 'unban');
+        if(Config::$serverName == 'quakenet'){
+            $this->on(IRC::RplWelcome, 'loginToQ');
+        }
 
 
         if ($this->bot->getUserNick() == self::NICKSERV) {
             $this->on(IRC::NOTICE, 'nickServ');
         }
+    }
+    protected function loginToQ()
+    {
+        $this->message('auth tokido ' . Config::$personal->password, 'Q@CServe.quakenet.org');
     }
 
     protected function addChannel()

@@ -47,7 +47,7 @@ class Configuration
         $config = json_decode($config);
         static::$serverName = (string) strtolower($nameBotConfig);
         static::$server = (string) $config->server;
-        static::$port = (int) $config->port;
+        static::$port = (string) $config->port;
         static::$personal = (object) $config->personal;
         static::$permit = (array) $config->permit;
         static::$channels = (array) $config->channels;
@@ -76,7 +76,7 @@ class Configuration
     private function setDefine()
     {
         define('IRC_EOL', "\r\n");
-        define('DEBUG', 0);
+        define('DEBUG', 1);
         define('DEFAULT_CONFIG', 'irchighway');
         define('SETTING_FOLDER', 'settings');
     }

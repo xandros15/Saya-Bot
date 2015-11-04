@@ -28,4 +28,4 @@ phpunit.phar
 
 /log
 
-/composer.lock
+composer.lock

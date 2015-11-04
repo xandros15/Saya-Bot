@@ -2,6 +2,7 @@
     "user": "",
     "password": "",
     "host": "",
+    "port": "",
     "name": "database",
     "type": "SQLITE"
 }

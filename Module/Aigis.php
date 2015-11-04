@@ -17,7 +17,7 @@ class Aigis extends \Library\Module
         $lastRequest = [],
         $unitList = [];
 
-    public function loadSettings()
+    public function loadSettings($object = null)
     {
         $this->setCommand([
             'trigger' => 'unit',
@@ -35,7 +35,7 @@ class Aigis extends \Library\Module
             'permit' => true
         ]);
 
-        parent::loadSettings();
+        parent::loadSettings($this);
     }
 
     protected function unit($arguments)
@@ -114,12 +114,14 @@ class Aigis extends \Library\Module
     {
         parent::RedBeanConnect(self::DB_NAME);
         foreach ($this->unitList as $unit) {
-            if (!$last = R::findOne(self::TB_NAME, 'link = ?', [$unit['link']])) {
-                $unitBean = R::dispense(self::TB_NAME);
-                $unitBean->import($unit);
-                R::store($unitBean);
-                $this->reply('Added ' . $unit['orginal']);
+            if (R::findOne(self::TB_NAME, 'orginal = ?', [$unit['orginal']]) ||
+                R::findOne(self::TB_NAME, 'linkgc = ?', [$unit['linkgc']])) {
+                continue;
             }
+            $unitBean = R::dispense(self::TB_NAME);
+            $unitBean->import($unit);
+            R::store($unitBean);
+            $this->reply('Added ' . $unit['orginal']);
         }
         R::close();
     }

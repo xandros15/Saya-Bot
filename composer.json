@@ -11,7 +11,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-         "php": ">=5.4.0",
-         "symfony/process": "*"
+        "php": ">=5.4.0",
+        "symfony/process": "*",
+        "league/climate": "dev-master"
     }
 }

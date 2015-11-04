@@ -26,7 +26,8 @@ class Url extends \Library\Module
 
     private
         $ctxDomainList = [
-            'http://t.co/' => [] //twitter
+            'http://t.co/' => [], //twitter
+            'https://t.co/' => [] //twitter
             ],
         $except = [
 //'touhou.pl' => 'block',

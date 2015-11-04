@@ -71,6 +71,7 @@ class Server implements BotInterface\ServerController
 
     public function sendData($data)
     {
+        (!DEBUG) or file_put_contents('debuger.log', date('[H:ia] ') . $data . PHP_EOL, FILE_APPEND);
         return $this->connection->sendData($data . IRC_EOL);
     }
 
@@ -103,9 +104,9 @@ class Server implements BotInterface\ServerController
         return $this->connection->isConnected();
     }
 
-    public function disconnect($force = false)
+    public function disconnect()
     {
-        $this->connection->disconnect((bool) $force);
+        $this->connection->disconnect();
         return $this;
     }
 
@@ -118,7 +119,7 @@ class Server implements BotInterface\ServerController
 
         $signsToDelete = [chr(9), chr(10), chr(11), chr(13), chr(0)];
         $message = trim(str_replace($signsToDelete, '', $data));
-
+        (!DEBUG) or file_put_contents('debuger.log', date('[H:ia] ') . $message . PHP_EOL, FILE_APPEND);
         if (!$message) {
             return false;
         }

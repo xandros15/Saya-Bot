@@ -12,7 +12,7 @@ class Fun extends \Library\Module
         API_GEL = 'http://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=100&',
         API_YAN = 'https://yande.re/post.xml?',
         API_SHORT = 'http://exsubs.anidb.pl/short/',
-        TRIGGER_YAN = 'YAN',
+        TRIGGER_GEL = 'GEL',
         TRIGGER_NSFW = 'NSFW',
         TRIGGER_SAFE = 'SAFE',
         TRIGGER_QUES = 'QUES',
@@ -29,7 +29,7 @@ class Fun extends \Library\Module
             ],
         $api, $rate;
 
-    public function loadSettings()
+    public function loadSettings($object = null)
     {
         libxml_set_streams_context($this->ctx);
         libxml_use_internal_errors(true);
@@ -40,18 +40,7 @@ class Fun extends \Library\Module
             'determiter' => ',',
             'help' => 'Randomize arguments. Determiter is set as ",". Example: "!c apple, banana, oranges".'
         ]);
-        $this->setCommand([
-            'trigger' => 'iroha',
-            'action' => 'iroha',
-            'arguments' => 1,
-            'channels' => ['#bodzio', '#xandros'],
-            'help' => 'Sending a link to episode. Just type "!iroha <nr of episode>" to get link.'
-        ]);
-        $this->setCommand([
-            'trigger' => 'kier',
-            'channels' => ['#bodzio', '#xandros'],
-            'action' => 'kier'
-        ]);
+        
         $this->setCommand([
             'trigger' => 'random',
             'action' => 'random',
@@ -64,15 +53,12 @@ class Fun extends \Library\Module
                 'nick' => 'Thebassa'
             ]
         ]);
+        
         $this->setCommand([
             'trigger' => 'biba',
             'reply' => 'Biba dance: https://www.youtube.com/watch?v=kpJcgkEdMRg'
         ]);
-        $this->setCommand([
-            'trigger' => 'hubi1',
-            'channels' => ['#bodzio'],
-            'reply' => '[10:31pm] <+hubi1> k-on byl fajny'
-        ]);
+
         $this->setCommand([
             'trigger' => 'maido',
             'reply' => 'Maido dance: https://www.youtube.com/watch?v=a-7_XdPktgc'
@@ -81,34 +67,29 @@ class Fun extends \Library\Module
             'trigger' => 'mikuluka',
             'reply' => 'https://www.youtube.com/watch?v=ZllY2wBLYN4'
         ]);
-        $this->setCommand([
-            'trigger' => 'okusama04',
-            'channels' => ['#bodzio'],
-            'notice' => 'prosze: https://mega.co.nz/#!HplkQaCZ!gTgt_BjzpEoUe6-5_ObXke_PDM-S9Me6xz8aW_cVD0A'
-        ]);
-        $this->setCommand([
-            'trigger' => 'nonnon11',
-            'channels' => ['#bodzio'],
-            'notice' => 'prosze: https://mega.nz/#!qolFGZpb!T3Ic5DDJKOy4TBp1xHnDtT4T9ctzianr-ofW_EZ9eT0'
-        ]);
+        
         $this->setCommand([
             'trigger' => 'rolypoly',
             'reply' => 'Roly-poly: http://www.youtube.com/watch?v=3Xolk2cFzlo'
         ]);
+        
         $this->setCommand([
             'trigger' => 'weaboo',
             'reply' => 'Weaboo song: https://www.youtube.com/watch?v=TBfWKmRFTjM'
         ]);
+        
         $this->setCommand([
             'trigger' => 'xandros',
             'reply' => '[9:58pm] <Inkwizytor> xandros, kup sobie slownik'
         ]);
+        
         $this->setCommand([
             'trigger' => 'cycki',
             'action' => 'cycki'
         ]);
+        
 
-        parent::loadSettings();
+        parent::loadSettings($this);
     }
 
     protected function cycki()
@@ -133,28 +114,6 @@ class Fun extends \Library\Module
         } else {
             $this->reply('Wrong arguments. Type "!Help c" to help');
         }
-    }
-
-    protected function iroha(array $arguments)
-    {
-        parent::RedBeanConnect('xandrosmaker_cba_pl');
-        $relese = R::findLast('relki', 'where `seria` LIKE ? AND  `ep` = ?', ['%Iroha%', (int) $arguments[0]]);
-        $message = ($relese) ? 'Prosze: ' . $relese->link : 'Jeszcze jej nie mam, ale lap w zamian ladny ending: http://exsubs.anidb.pl/?wpfb_dl=28';
-        $this->message($message, $this->bot->getUserNick(), IRC::NOTICE);
-        R::close();
-    }
-
-    protected function kier()
-    {
-        if ($this->kierCount == 3) {
-            $this->kierCount = 0;
-        }
-        $text = [
-            '[10:52pm] <KieR> robotic notes bylo niezle',
-            '[3:34pm] <KieR> mi sie w portalu podobalo sikanie na ludzi xD',
-            '[7:56pm] <KieR> grac we wladce [7:56pm] <KieR> a nie jakies gowna xD',
-        ];
-        $this->reply($text[$this->kierCount++]);
     }
 
     protected function random(array $arguments = [])
@@ -245,12 +204,12 @@ class Fun extends \Library\Module
 
     private function setApi(array $arguments)
     {
-        $key = array_search(self::TRIGGER_YAN, array_map('strtoupper', $arguments));
+        $key = array_search(self::TRIGGER_GEL, array_map('strtoupper', $arguments));
         if ($key !== false) {
-            $this->api = self::API_YAN;
+            $this->api = self::API_GEL;
             unset($arguments[$key]);
         } else {
-            $this->api = self::API_GEL;
+            $this->api = self::API_YAN;
         }
         return $arguments;
     }

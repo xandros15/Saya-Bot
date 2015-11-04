@@ -21,7 +21,7 @@ class Commands extends \Library\Module
         TRIGGER_DELETE = 'del',
         TRIGGER_EDIT = 'edit';
 
-    public function loadSettings()
+    public function loadSettings($object = null)
     {
         $this->setCommand([
             'trigger' => 'cmd',

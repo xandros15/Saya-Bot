@@ -6,7 +6,8 @@ if (version_compare(PHP_VERSION, '5.4.0', '<')) {
 chdir(__DIR__);
 defined('ROOT_DIR') or define('ROOT_DIR', __DIR__);
 
-
+defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
+defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 // Make autoload working
 
 /* @var $loader Composer\Autoload\ClassLoader */

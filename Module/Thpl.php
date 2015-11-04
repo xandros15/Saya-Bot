@@ -15,6 +15,7 @@ class Thpl extends \Library\Module
         FILE_DATA_NAME = 'ThplData.json',
         FORUM_API = 'http://www.touhou.pl/4um/index.php?type=atom;action=.xml',
         SHORT_URL = 'http://4um.touhou.pl',
+        API_WALL_URL = 'http://api.touhou.pl/wallpaper/random',
         URL_TO_ID_REGEX = '~^(?:.*?)4um/.*?topic,([0-9]+)\.msg([0-9]+)(?:.*?)$~',
         NEWS_TEXT_FORMAT = '7Forum: %s 3[Touhou3] 9Temat: %s %s',
         REGEX_URL_ERROR = '~^HTTP/[12]\.[0-9] [54][0-9]{2}.*$~i',
@@ -42,6 +43,14 @@ class Thpl extends \Library\Module
             'channels' => ['#touhoupl', '#xandros'],
             'action' => 'action'
         ]);
+        $this->setCommand([
+            'trigger' => 'thwall',
+            'help' => 'Searching best wallpapers from Touhou (I guess). '
+            . 'Syntax: "!thwall [arguments|id]+". Accepts wildcards.',
+            'arguments' => -1,
+            'channels' => ['#touhoupl'],
+            'action' => 'randomWall'
+        ]);
         parent::loadSettings();
     }
 
@@ -58,6 +67,41 @@ class Thpl extends \Library\Module
             'lastNewsTime' => $this->lastNewsTime,
             'lastPostTime' => $this->lastPostTime
         ];
+    }
+    protected function randomWall(array $arguments = [])
+    {
+        $id = [];
+        if ($arguments) {
+            foreach ($arguments as $argument => $value) {
+                if (strpos($value, '/') !== false) {
+                    $value = str_replace('/', '', $value);
+                }
+                if(preg_match('~^\d+$~', $value) && empty($id)) {
+                    $id = $value;
+                    unset($arguments[$argument]);
+                    continue;
+                }
+                $arguments[$argument] = $value;
+            }
+            $arguments = implode('%20', $arguments);
+        }
+        $apiUrl = self::API_WALL_URL;
+        $apiUrl .= ($arguments) ? '/' . $arguments : '';
+        $apiUrl .= ($id) ? '/' . $id : '';
+        $result = $this->loadStreamUrl($apiUrl);
+        $jsonResult = json_decode($result);
+        if (!$jsonResult) {
+            return $this->reply('Sorry, no results.');
+        }
+        $data = [
+            '{name}' => $jsonResult->name,
+            '{resolution}' => $jsonResult->info->{0} . 'x' . $jsonResult->info->{1},
+            '{url}' => $jsonResult->url,
+            '{nsfw}' => $jsonResult->safe ? '' : IRCHelper::colorText('NSFW', IRCHelper::COLOR_PINK),
+        ];
+        $message = 'Random tapcia - {name} [{resolution}] here: {url} {nsfw}';
+        $message = str_replace(array_keys($data), array_values($data), $message);
+        $this->reply(trim($message));
     }
 
     protected function sendLastForumPost()
