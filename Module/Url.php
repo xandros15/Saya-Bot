@@ -7,6 +7,7 @@ use DOMXPath;
 use Library\Constants\IRC;
 use Library\Helper\IRCHelper;
 use Library\Helper\UrlHelper;
+use RuntimeException;
 
 /**
  *
@@ -29,14 +30,14 @@ class Url extends \Library\Module
             'http://t.co/' => [], //twitter
             'https://t.co/' => [] //twitter
             ],
-        $except = [
+        $except        = [
 //'touhou.pl' => 'block',
             'myanimelist.net' => 'block',
             'mega.co.nz' => 'block',
             'mega.nz' => 'block',
             'anidb.net' => 'pass'
             ],
-        $openGraph = [
+        $openGraph     = [
             'kwejk.pl' => 'title',
             'twitch.tv' => 'description'
     ];
@@ -57,23 +58,28 @@ class Url extends \Library\Module
 
     protected function findTitle()
     {
-
         $arguments = explode(' ', $this->bot->getMessage());
-        foreach ($arguments as $text) {
-            if (($url = $this->isUrl($text))) {
-                $openGraph = false;
-                foreach ($this->openGraph as $host => $metadata) {
-                    if (strpos($url, $host) !== false) {
-                        $openGraph = $metadata;
-                        break;
-                    }
-                }
-                $title = $this->getTitle($url, $openGraph);
-                if (!empty($title)) {
-                    $this->reply($title);
-                }
+        foreach ($arguments as $nr => $text) {
+            if (!($url = $this->isUrl($text))) {
+                continue;
+            }
+            $openGraph = $this->getOpenGraph($url);
+            $title     = $this->getTitle($url, $openGraph);
+            if (!$title) {
+                continue;
+            }
+            $this->reply($title);
+        }
+    }
+
+    private function getOpenGraph($url)
+    {
+        foreach ($this->openGraph as $host => $metadata) {
+            if (strpos($url, $host) !== false) {
+                return $metadata;
             }
         }
+        return false;
     }
 
     private function isUrl($link)
@@ -103,9 +109,10 @@ class Url extends \Library\Module
         if (filter_var($parse['host'], FILTER_VALIDATE_IP)) {
             return $link;
         } else {
-            $dot = strrpos($parse['host'], '.') - strlen($parse['host']);
+            $dot    = strrpos($parse['host'], '.') - strlen($parse['host']);
             $domain = strtoupper(substr($parse['host'], $dot + 1));
-            return (array_intersect([$domain], UrlHelper::domainList())) ? $link : false;
+            return (array_intersect([$domain], UrlHelper::domainList())) ? $link
+                    : false;
         }
     }
 
@@ -121,7 +128,7 @@ class Url extends \Library\Module
 
     protected function humanFilesize($bytes, $decimals = 2)
     {
-        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $size   = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
     }
@@ -151,7 +158,8 @@ class Url extends \Library\Module
             }
         }
         if (!empty($httpHeader['content-encoding'])) {
-            $html = $this->contentEncoding($html, $httpHeader['content-encoding']);
+            $html = $this->contentEncoding($html,
+                $httpHeader['content-encoding']);
         }
         //$size = (!empty($httpHeader['content-length'])) ?
         //    round(($httpHeader['content-length'] / 1024 / 1024), 2) . 'MB' : 0;       
@@ -160,7 +168,8 @@ class Url extends \Library\Module
             //list($width, $height) = $this->getimagesizefromstring($html);
             //return $this->text("$width x $height in " . $this->humanFilesize(strlen($html)), self::TYPE_IMG);
         }
-        if (preg_match('/(video|zip|rar|octet-stream)/i', $httpHeader['content-type'])) {
+        if (preg_match('/(video|zip|rar|octet-stream)/i',
+                $httpHeader['content-type'])) {
             return false;
             //return $this->text('Video file, binary file or sth else', self::TYPE_VIDEO);
         }
@@ -174,17 +183,20 @@ class Url extends \Library\Module
             unset($m);
         }
 
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', (isset($charset)) ? $charset : 'UTF-8');
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES',
+            (isset($charset)) ? $charset : 'UTF-8');
         try {
 
-            $doc = $this->getDOM();
-            $loaded = $doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $doc    = $this->getDOM();
+            $loaded = $doc->loadHTML($html,
+                LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
             /* $doc->loadHTML('<?xml encoding="' . (isset($charset) ? $charset : 'utf-8') . '" ?>' . $html); */
 
             /* fallback to regex */
 
             if (!$loaded) {
-                if (preg_match("#<title[^>]*>(.*?)</title>#Umsi", $html, $matches)) {//Umsi
+                if (preg_match("#<title[^>]*>(.*?)</title>#Umsi", $html,
+                        $matches)) {//Umsi
                     return $this->text(html_entity_decode(
                                 preg_replace('/\s+/', ' ', $matches[1])
                             ), self::TYPE_PAGE);
@@ -195,15 +207,15 @@ class Url extends \Library\Module
             if ($openGraph) {
                 $metadata = (new DOMXPath($doc))->query(self::OPEN_GRAPH_QUERY);
                 foreach ($metadata as $meta) {
-                    $property = $meta->getAttribute('property');
-                    $content = $meta->getAttribute('content');
+                    $property          = $meta->getAttribute('property');
+                    $content           = $meta->getAttribute('content');
                     $rmetas[$property] = $content;
                 }
                 if (isset($rmetas['og:' . $openGraph])) {
                     return $this->text($rmetas['og:' . $openGraph]);
                 }
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             return $this->text($e->getMessage(), self::TYPE_ERROR);
         }
         return (
