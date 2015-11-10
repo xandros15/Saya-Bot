@@ -8,6 +8,7 @@ use Library\Filter;
 use Library\Constants\IRC;
 use ReflectionClass;
 use Exception;
+use Library\Debugger\Logger;
 
 /* Interfaces */
 
@@ -212,7 +213,7 @@ class Bot
     {
         $namespace = 'Module';
         foreach ($module as $moduleName) {
-            echo 'load ' . $moduleName . ' module... '; //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
+            Logger::add('load ' . $moduleName . ' module', Logger::INFO); //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
             $reflector = new ReflectionClass("{$namespace}\\{$moduleName}");
             $instance = $reflector->newInstance();
             $name = $reflector->getShortName();
@@ -222,7 +223,7 @@ class Bot
             $this->module[$name] = $instance;
             $this->module[$name]->setIRCBot($this);
             $this->module[$name]->loadSettings();
-            echo 'done' . PHP_EOL; //fwrite(STDOUT, 'done' . PHP_EOL);
+            echo Logger::add('done', Logger::INFO);
         }
     }
 
@@ -260,7 +261,7 @@ class Bot
     private function setupBot()
     {
         (new Config())->simpleConfiguration();
-
+        (new Logger)->setLogger('debug.log', '.', Config::DEFAULT_TIMEZONE);
         $server = new Server();
         $server->getTextline();
         $server->setHost(Config::$server);
