@@ -68,8 +68,14 @@ class Url extends \Library\Module
             if (!$title) {
                 continue;
             }
-            $this->reply($title);
+            $this->reply($this->addNsfw($arguments, $nr, $title));
         }
+    }
+
+    private function addNsfw(array $arguments, $nr, $title)
+    {
+        return (mb_stripos($arguments[$nr + 1], 'nsfw') !== false) ?
+            $title .= ' [' . IRCHelper::colorText('NSFW', IRCHelper::COLOR_PINK) . ']' : $title;
     }
 
     private function getOpenGraph($url)
