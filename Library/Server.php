@@ -9,7 +9,7 @@ use Library\Helper\ServerHelper;
 
 class Server implements BotInterface\ServerController
 {
-    const NUMBER_OF_RECONNECTS = 10;
+    public $maxReconnects = 10;
 
     private $name;
     private $host;
@@ -71,7 +71,6 @@ class Server implements BotInterface\ServerController
 
     public function sendData($data)
     {
-        (!DEBUG) or file_put_contents('debuger.log', date('[H:ia] ') . $data . PHP_EOL, FILE_APPEND);
         return $this->connection->sendData($data . IRC_EOL);
     }
 
@@ -81,19 +80,16 @@ class Server implements BotInterface\ServerController
             $this->connection->disconnect();
         }
         $ports = ServerHelper::parsePorts($this->getPorts());
-        $nrOfPorts = count($ports);
-        $portKey = 0;
-        $try = self::NUMBER_OF_RECONNECTS;
+        $try = $this->maxReconnects;
         while (($try--)) {
-            $port = $ports[$portKey];
-            $this->connection->connect($this->getHost(), $port);
+            $this->connection->connect($this->getHost(), current($ports));
             if ($this->connection->isConnected()) {
                 return true;
             }
-            if (++$portKey > ($nrOfPorts - 1)) {
-                $portKey = 0;
+            if (next($ports) === false) {
+                reset($ports);
             }
-            sleep(1 + self::NUMBER_OF_RECONNECTS - $try);
+            sleep(1 + $this->maxReconnects - $try);
         }
         //TODO add error
         return false;
