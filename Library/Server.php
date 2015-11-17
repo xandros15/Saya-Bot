@@ -115,7 +115,6 @@ class Server implements BotInterface\ServerController
 
         $signsToDelete = [chr(9), chr(10), chr(11), chr(13), chr(0)];
         $message = trim(str_replace($signsToDelete, '', $data));
-        (!DEBUG) or file_put_contents('debuger.log', date('[H:ia] ') . $message . PHP_EOL, FILE_APPEND);
         if (!$message) {
             return false;
         }
