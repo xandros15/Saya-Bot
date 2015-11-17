@@ -74,7 +74,8 @@ class Url extends \Library\Module
 
     private function addNsfw(array $arguments, $nr, $title)
     {
-        return (mb_stripos($arguments[$nr + 1], 'nsfw') !== false) ?
+
+        return ((isset($arguments[$nr + 1])) && (mb_stripos($arguments[$nr + 1], 'nsfw') !== false)) ?
             $title .= ' [' . IRCHelper::colorText('NSFW', IRCHelper::COLOR_PINK) . ']' : $title;
     }
 
