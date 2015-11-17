@@ -408,7 +408,6 @@ abstract class Module
      */
     protected static function RedBeanConnect($dbname, $frozen = true)
     {
-
         require_once (implode(DIRECTORY_SEPARATOR, [ROOT_DIR, 'Library', 'database', 'rb.php']));
         if (isset(R::$toolboxes[$dbname])) {
             R::selectDatabase($dbname);
@@ -436,7 +435,6 @@ abstract class Module
             R::selectDatabase($dbname);
         }
         R::setAutoResolve();
-        R::fancyDebug(DEBUG);
     }
 
     private function settingFile($mode, $content = null, $object = null)
