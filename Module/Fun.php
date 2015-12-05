@@ -109,8 +109,9 @@ class Fun extends \Library\Module
 
     protected function c(array $arguments = [])
     {
-        if ($arguments && is_array($arguments)) {
-            $this->reply(trim($arguments[mt_rand(0, count($arguments) - 1)]));
+        $numberOfArguments = count($arguments);
+        if ($numberOfArguments >= 2) {
+            $this->reply(trim($arguments[mt_rand(0, $numberOfArguments - 1)]));
         } else {
             $this->reply('Wrong arguments. Type "!Help c" to help');
         }
