@@ -9,8 +9,8 @@ use Exception;
 class Logger extends Core implements Logger
 {
     const
-        ERROR = 0,
-        WARRNING = 1,
+        ERROR = 1,
+        WARRNING = 2,
         INFO = 3,
         SUCCESS = 4;
 
