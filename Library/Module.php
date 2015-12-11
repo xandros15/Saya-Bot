@@ -26,10 +26,10 @@ abstract class Module
 
     protected
     /** @var \Library\Bot */
-        $bot = null,
-        $commands = [],
-        $executeTime = [],
-        $httpHeader = [];
+        $bot             = null,
+        $commands        = [],
+        $executeTime     = [],
+        $httpHeader      = [];
     static protected $dbConfig = null;
 
     public function __toString()
@@ -68,18 +68,32 @@ abstract class Module
             }
             if (!$this->checkCommand($command, self::CHECK_PERMIT)) {
                 $this->reply('I don\'t listen to you! Baaka!');
-                continue;
+                return;
             } elseif ($this->checkCommand($command, self::CHECK_BAN)) {
                 $this->reply('You scary me ._.');
-                continue;
+                return;
             }
             if ($command['reply']) {
                 $this->reply($command['reply']);
+                return;
             }
             if ($command['notice']) {
                 $this->message($command['notice'], $this->bot->getUserNick(), IRC::NOTICE);
+                return;
             }
-            if ($command['action'] && method_exists($this, $command['action'])) {
+            if (!$command['action']) {
+                return;
+            }
+            if (is_array($command['action']) && is_callable($command['action'])) {
+                if (($arguments = $this->getArguments($command)) !== false) {
+                    if (count($arguments) > 0) {
+                        call_user_func_array($command['action'], [$arguments]);
+                    } else {
+                        call_user_func($command['action']);
+                    }
+                }
+            }
+            if (method_exists($this, $command['action'])) {
                 if (($arguments = $this->getArguments($command)) !== false) {
                     if (count($arguments) > 0) {
                         call_user_func_array([$this, $command['action']], [$arguments]);
@@ -98,7 +112,7 @@ abstract class Module
             if (!file_exists($dbConfigFile)) {
                 new Exception('Don\'t found a config filename:' . $dbConfigFile);
             }
-            $dbConfig = static::$dbConfig = json_decode(file_get_contents($dbConfigFile));
+            $dbConfig         = static::$dbConfig = json_decode(file_get_contents($dbConfigFile));
         }
         if (!$object || !method_exists($object, 'propertyToSave')) {
             return;
@@ -130,7 +144,7 @@ abstract class Module
             return;
         }
         $settings = $this->propertyToSave();
-        $json = json_encode($settings, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $json     = json_encode($settings, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
 
         return $this->settingFile(self::FILE_SAVE, $json);
     }
@@ -188,8 +202,8 @@ abstract class Module
     {
         foreach ($this->bot->module as $module) {
             if (isset($module->commands[$command[$command['trigger']]])) {
-                $oldCommand = $module->commands[$command['trigger']];
-                $newCommand = array_replace_recursive($oldCommand, $command);
+                $oldCommand                          = $module->commands[$command['trigger']];
+                $newCommand                          = array_replace_recursive($oldCommand, $command);
                 $this->commands[$command['trigger']] = $newCommand;
                 echo "Command {$command['trigger']} was edited" . PHP_EOL;
                 return true;
@@ -202,7 +216,7 @@ abstract class Module
     protected function getArguments($command)
     {
         $lenTrigger = strlen($command['trigger']) + strlen(Config::$commandPrefix);
-        $offtext = trim(substr($this->bot->getMessage(), $lenTrigger));
+        $offtext    = trim(substr($this->bot->getMessage(), $lenTrigger));
         $determiter = ($command['determiter']) ? $command['determiter'] : ' ';
         if ($offtext === '') {
             $arguments = [];
@@ -237,7 +251,8 @@ abstract class Module
             'http' =>
             [
                 'timeout' => 15,
-                'header' => implode("\r\n", [
+                'header' => implode("\r\n",
+                    [
                     'Accept-Language: en-US,en;q=0.8',
                     'Accept-Charset:UTF-8,*;q=0.5',
                     'User-Agent: Mozilla/5.0 (X11; Linux x86_64) ' .
@@ -251,9 +266,9 @@ abstract class Module
                 'verify_peer' => false
             ]
         ];
-        if($login){
-            $auth = sprintf('%s:%s', $login['login'], $login['key']);
-            $encodedAuth = base64_encode($auth);
+        if ($login) {
+            $auth                   = sprintf('%s:%s', $login['login'], $login['key']);
+            $encodedAuth            = base64_encode($auth);
             $opts['http']['header'] = $encodedAuth . "\r\n" . $opts['http']['header'];
         }
 
@@ -282,8 +297,8 @@ abstract class Module
 
     protected function getDOM()
     {
-        $dom = new DOMDocument;
-        $dom->recover = true;
+        $dom                      = new DOMDocument;
+        $dom->recover             = true;
         $dom->strictErrorChecking = false;
         return $dom;
     }
@@ -304,7 +319,7 @@ abstract class Module
         } elseif ($callback instanceof \Closure) {
             $callbackId = FunctionHash::from($callback);
         } elseif (method_exists($this, $callback)) {
-            $callback = [$this, $callback];
+            $callback   = [$this, $callback];
             $callbackId = "{$callback[0]}\\{$callback[1]}";
         } else {
             throw new Exception("Can't call function in {$this} class. Callback no exists or isn't callable.");
@@ -342,7 +357,7 @@ abstract class Module
         if (isset(static::$listener[$functionOptions['id']])) {
             return false;
         }
-        $id = $functionOptions['id'];
+        $id                    = $functionOptions['id'];
         unset($functionOptions['id']);
         static::$listener[$id] = $functionOptions;
         return $id;
@@ -415,21 +430,21 @@ abstract class Module
             $dbConfig = static::$dbConfig;
             switch (strtoupper($dbConfig->type)) {
                 case 'SQLITE':
-                    $dns = sprintf('sqlite:/tmp/%s.sqlite3', $dbname);
-                    $dbConfig->user = $dbConfig->password = null;
+                    $dns                = sprintf('sqlite:/tmp/%s.sqlite3', $dbname);
+                    $dbConfig->user     = $dbConfig->password = null;
                     break;
                 case 'MARIA':
-                    $host = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
-                    $dns = sprintf('mysql:host=%s;dbname=%s', $host, $dbname);
+                    $host               = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
+                    $dns                = sprintf('mysql:host=%s;dbname=%s', $host, $dbname);
                     break;
                 case 'POSTGRESQL':
-                    $host = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
-                    $dns = sprintf('pgsql:host=%s;dbname=%s', $host, $dbname);
+                    $host               = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
+                    $dns                = sprintf('pgsql:host=%s;dbname=%s', $host, $dbname);
                     break;
                 case null:
                 default :
-                    $dns = null;
-                    $dbConfig->user = $dbConfig->password = null;
+                    $dns                = null;
+                    $dbConfig->user     = $dbConfig->password = null;
             }
             R::addDatabase($dbname, $dns, $dbConfig->user, $dbConfig->password, $frozen);
             R::selectDatabase($dbname);
@@ -439,11 +454,12 @@ abstract class Module
 
     private function settingFile($mode, $content = null, $object = null)
     {
-        $object = ($object) ? $object : $this;
+        $object   = ($object) ? $object : $this;
         $filename = (new ReflectionClass($object))->getShortName() . '.json';
         switch ($mode) {
             case self::FILE_LOAD;
-                $pathname = implode(DIRECTORY_SEPARATOR, [
+                $pathname = implode(DIRECTORY_SEPARATOR,
+                    [
                     ROOT_DIR,
                     self::SETTING_PATHNAME,
                     Config::getServerName(),
@@ -454,7 +470,8 @@ abstract class Module
                 }
                 return file_get_contents($pathname);
             case self::FILE_SAVE;
-                $pathname = implode(DIRECTORY_SEPARATOR, [
+                $pathname = implode(DIRECTORY_SEPARATOR,
+                    [
                     ROOT_DIR,
                     self::SETTING_PATHNAME,
                     Config::getServerName()
