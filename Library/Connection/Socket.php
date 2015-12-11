@@ -2,6 +2,8 @@
 
 namespace Library\Connection;
 
+use Library\Debugger\Logger;
+
 class Socket implements \Library\BotInterface\Connection
 {
     private $socket;
@@ -32,7 +34,9 @@ class Socket implements \Library\BotInterface\Connection
         $dns = sprintf('tcp://%s:%d', $host, $port);
 
         $socket = @stream_socket_client($dns, $errno, $errstr, 1);
-        //TODO error holder
+        if($errstr){
+            Logger::add("Can't connect to {$host}:{$port}. {$errno}: {$errstr}", Logger::ERROR);
+        }
         if ($socket === false) {
             return false;
         }
