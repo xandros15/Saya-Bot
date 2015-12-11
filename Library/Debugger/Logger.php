@@ -3,10 +3,10 @@
 namespace Library\Debugger;
 
 use Library\Debugger\Core;
-use Library\BotInterface\Logger;
+use Library\BotInterface\Logger as LoggerInterface;
 use Exception;
 
-class Logger extends Core implements Logger
+class Logger extends Core implements LoggerInterface
 {
     const
         ERROR = 1,
