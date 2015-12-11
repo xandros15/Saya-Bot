@@ -6,9 +6,12 @@ use Library\Debugger\Logger;
 
 class Socket implements \Library\BotInterface\Connection
 {
+    const DEFAULT_TIMEOUT = 60 * 5; //5min
+
     private $socket;
     private $host;
     private $port;
+    private $lastMessageTime = 0;
 
     public function __destruct()
     {
@@ -34,18 +37,23 @@ class Socket implements \Library\BotInterface\Connection
         $dns = sprintf('tcp://%s:%d', $host, $port);
 
         $socket = @stream_socket_client($dns, $errno, $errstr, 1);
-        if($errstr){
+
+        if ($errstr) {
             Logger::add("Can't connect to {$host}:{$port}. {$errno}: {$errstr}", Logger::ERROR);
         }
+
         if ($socket === false) {
             return false;
         }
 
         stream_set_blocking($socket, false);
 
-        $this->port = (int) $port;
-        $this->host = (string) $host;
+        $this->port   = (int) $port;
+        $this->host   = (string) $host;
         $this->socket = $socket;
+
+        $this->lastMessageTime = time();
+
         return true;
     }
 
@@ -63,7 +71,7 @@ class Socket implements \Library\BotInterface\Connection
     public function isConnected()
     {
         $socket = $this->socket;
-        return (!is_resource($socket)) ? false : (!feof($socket));
+        return (!is_resource($socket)) ? false : (!feof($socket) || !$this->isTimeout());
     }
 
     public function sendData($data)
@@ -73,12 +81,21 @@ class Socket implements \Library\BotInterface\Connection
 
     public function getData()
     {
-        return fgets($this->socket, 512);
+        if (($data = fgets($this->socket, 512))) {
+            $this->lastMessageTime = time();
+        }
+
+        return $data;
     }
 
     public function setTimeout($seconds)
     {
         stream_set_timeout($this->socket, $seconds);
         return $this;
+    }
+
+    public function isTimeout()
+    {
+        return (time() > ($this->lastMessageTime + self::DEFAULT_TIMEOUT));
     }
 }
