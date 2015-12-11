@@ -11,14 +11,27 @@ class Core
 {
     protected
         $timezoneName = 'UTC';
+    protected static
+    /** @var Core */
+        $logger;
     private
-    /**
-     *  @var DateTime
-     */
+    /**  @var DateTime */
         $datetime,
         $filename,
         $dirname,
         $ext;
+
+    public function setLogger($filename, $dirname, $timezone = 'UTC')
+    {
+        if (isset(self::$logger)) {
+            return self::$logger;
+        }
+        $core         = new Core();
+        $core->setDatetime($timezone)
+            ->setDirname($dirname)
+            ->setFilename($filename);
+        return self::$logger = $core;
+    }
 
     public function save($message)
     {
