@@ -3,8 +3,9 @@
 namespace Library\Connection;
 
 use Library\Debugger\Logger;
+use Library\BotInterface\Connection;
 
-class Socket implements \Library\BotInterface\Connection
+class Socket implements Connection
 {
     const DEFAULT_TIMEOUT = 60 * 5; //5min
 
