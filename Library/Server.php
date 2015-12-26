@@ -6,6 +6,7 @@ use Library\Chatter\Textline;
 use Library\Chatter\MessageRelay;
 use Library\Connection\Socket;
 use Library\Helper\ServerHelper;
+use Library\Debugger\Logger;
 
 class Server implements BotInterface\ServerController
 {
@@ -91,7 +92,9 @@ class Server implements BotInterface\ServerController
             }
             sleep(1 + $this->maxReconnects - $try);
         }
-        //TODO add error
+
+        Logger::add("Can't connect to {$this->host}:{$this->ports}", Logger::ERROR);
+
         return false;
     }
 
