@@ -148,8 +148,11 @@ class Server implements BotInterface\ServerController
         if ($this->connection->isConnected()) {
             $this->connection->disconnect();
         }
+
         $ports = ServerHelper::parsePorts($this->getPorts());
-        $try   = $this->maxReconnects;
+
+        $try = $this->maxReconnects;
+
         while (($try--)) {
             $this->connection->connect($this->getHost(), current($ports));
             if ($this->connection->isConnected()) {
@@ -199,12 +202,14 @@ class Server implements BotInterface\ServerController
             return false;
         }
 
-        $signsToDelete = [chr(9), chr(10), chr(11), chr(13), chr(0)];
-        $message       = trim(str_replace($signsToDelete, '', $data));
+        $message = trim(str_replace([chr(9), chr(10), chr(11), chr(13), chr(0)], '', $data));
+
         if (!$message) {
             return false;
         }
+
         $this->messageRelay->setMessage($message);
+
         return $this->textline->update();
     }
 }
