@@ -9,56 +9,86 @@ use Library\Debugger\Logger;
 
 class Core
 {
-    protected
-        $timezoneName = 'UTC';
-    protected static
-    /** @var Core */
-        $logger;
-    private
-    /**  @var DateTime */
-        $datetime,
-        $filename,
-        $dirname,
-        $ext;
+    const
+        ERROR = 1,
+        WARRNING = 2,
+        INFO = 3,
+        SUCCESS = 4;
 
-    public function setLogger($filename, $dirname, $timezone = 'UTC')
+    /** @var string */
+    protected $timezoneName = 'UTC';
+
+    /** @var Core */
+    protected static $logger;
+
+    /**  @var DateTime */
+    private $datetime;
+
+    /** @var string */
+    private $filename;
+
+    /** @var string */
+    private $dirname;
+
+    /** @var string */
+    private $ext;
+
+    private function __construct()
+    {
+
+    }
+
+    private function __clone()
+    {
+
+    }
+
+    public static function add($message, $type = self::INFO)
+    {
+        if (!self::$logger) {
+            throw new Exception('No configured logger');
+        }
+    }
+
+    public static function setLogger($filename, $dirname, $timezone = 'UTC')
     {
         if (isset(self::$logger)) {
             return self::$logger;
         }
-        $core         = new Core();
+        $core = new Core();
+
         $core->setDatetime($timezone)
             ->setDirname($dirname)
             ->setFilename($filename);
         return self::$logger = $core;
     }
 
-    public function save($message)
+    protected function save($message)
     {
         return (file_put_contents($this->getPath(), $message, FILE_APPEND));
     }
 
-    public function getPath()
+    protected function getPath()
     {
         return $this->dirname . DIRECTORY_SEPARATOR . $this->filename . '.' . $this->ext;
     }
 
-    public function getFilename()
+    protected function getFilename()
     {
         return $this->filename;
     }
 
-    public function getDirname()
+    protected function getDirname()
     {
         return $this->dirname;
     }
 
-    public function getExt()
+    protected function getExt()
     {
         return $this->ext;
     }
 
-    public function flatten(array $array, $prefix)
+    protected function flatten(array $array, $prefix)
     {
         $string = '';
         foreach ($array as $row) {

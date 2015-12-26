@@ -261,7 +261,7 @@ class Bot
     private function setupBot()
     {
         (new Config())->simpleConfiguration();
-        (new Logger)->setLogger('debug.log', '.', Config::DEFAULT_TIMEZONE);
+        Logger::setLogger('debug.log', '.', Config::DEFAULT_TIMEZONE);
         $server = new Server();
         $server->getTextline();
         $server->setHost(Config::$server);

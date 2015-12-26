@@ -8,24 +8,19 @@ use Exception;
 
 class Logger extends Core implements LoggerInterface
 {
-    const
-        ERROR = 1,
-        WARRNING = 2,
-        INFO = 3,
-        SUCCESS = 4;
 
     public static function add($message, $type = self::INFO)
     {
-        $core   = static::$logger;
-        $prefix = $core->getPrefix($type);
+        parent::add($message, $type);
+        $prefix = self::$logger->getPrefix($type);
         if (is_array($message)) {
-            $message = $core->flatten($message, $prefix);
+            $message = self::$logger->flatten($message, $prefix);
         } elseif (is_string($message)) {
             $message = $prefix . trim($message) . PHP_EOL;
         } else {
             throw new Exception('Message must be a string or array. Is ' . gettype($message));
         }
-        $core->save($message);
+        self::$logger->save($message);
         return $message;
     }
 }
