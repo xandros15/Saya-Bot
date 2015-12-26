@@ -21,7 +21,7 @@ class ServerHelper
             if (strpos($port, '-') !== false) {
                 $port = explode('-', $port);
                 if (count($ports) != 2) {
-                    throw new Exception('$ports is wrong variable string. Given %s', 1, $ports);
+                    throw new Exception("ports is wrong variable string. Given {$ports}");
                 }
                 $finalPorts = array_merge($finalPorts, range(min($port), max($port)));
             } else {
