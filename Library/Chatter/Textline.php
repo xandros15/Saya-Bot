@@ -4,7 +4,7 @@ namespace Library\Chatter;
 
 use Library\Configuration as Config;
 
-class Textline implements \Library\BotInterface\Chatter
+class Textline
 {
     const MESSAGE_REGEX = '~^(?:[:](\S+) )?(\S+)(?: (?!:)(.+?))?(?: [:](.+))?$~';
     const MASK_REGEX = '/^(?:(\S+)!~?(\S+)\@)?(\S+)$/';
