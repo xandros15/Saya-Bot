@@ -39,6 +39,17 @@ class User
     }
 
     /**
+     * same as say, just reply message
+     *
+     * @param int $message
+     * @return int
+     */
+    public function sayR($message)
+    {
+        return $this->say($this->server->getTextline()->getSource(), $message);
+    }
+
+    /**
      * sending notice to target
      * syntax: NOTICE <msgtarget> <message>
      *
@@ -51,6 +62,17 @@ class User
         $data = sprintf('NOTICE %s :%s', $nameOrChan, $message);
 
         return $this->server->sendData($data);
+    }
+
+    /**
+     * same as notice, just reply message
+     *
+     * @param int $message
+     * @return int
+     */
+    public function noticeR($message)
+    {
+        return $this->notice($this->server->getTextline()->getSource(), $message);
     }
 
     /**
