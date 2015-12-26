@@ -149,6 +149,10 @@ class Server implements BotInterface\ServerController
             $this->connection->disconnect();
         }
 
+        if (!$this->getPorts() || !$this->getHost()) {
+            throw new Exception("There isn't set port or host");
+        }
+
         $ports = ServerHelper::parsePorts($this->getPorts());
 
         $try = $this->maxReconnects;
