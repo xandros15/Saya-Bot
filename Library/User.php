@@ -28,7 +28,7 @@ class User
      * syntax: PRIVMSG <msgtarget> <message>
      *
      * @param string $nameOrChan
-     * @param type $message
+     * @param string $message
      * @return int
      */
     public function say($nameOrChan, $message)
@@ -43,7 +43,7 @@ class User
      * syntax: NOTICE <msgtarget> <message>
      *
      * @param string $nameOrChan
-     * @param type $message
+     * @param string $message
      * @return int
      */
     public function notice($nameOrChan, $message)
@@ -57,7 +57,7 @@ class User
      * change nickname
      * syntax: NICK <nickname>
      *
-     * @param type $nickname
+     * @param string $nickname
      * @return int
      */
     public function nick($nickname)
@@ -71,7 +71,7 @@ class User
      * join to channel
      * syntax: JOIN <channels> [<keys>]
      *
-     * @param type $channel
+     * @param string $channel
      * @return int
      */
     public function join($channel)
@@ -89,8 +89,8 @@ class User
      * part from channel
      * syntax: PART <channels> [<message>]
      *
-     * @param type $channel
-     * @param type $message
+     * @param string $channel
+     * @param string $message
      * @return int
      */
     public function part($channel, $message = '')
@@ -108,8 +108,8 @@ class User
      * quit from server
      * syntax: QUIT [<message>]
      *
-     * @param type $message
-     * @return type
+     * @param string $message
+     * @return int
      */
     public function quit($message = '')
     {
@@ -122,9 +122,9 @@ class User
      * kick from channel
      * syntax: KICK <channel> <client> [<message>]
      *
-     * @param type $name
-     * @param type $message
-     * @return type
+     * @param string $name
+     * @param string $message
+     * @return int
      */
     public function kick($channel, $name, $message = '')
     {
@@ -159,8 +159,8 @@ class User
      * set topic of channel
      * syntax: TOPIC <channel> [<topic>]
      *
-     * @param type $channel
-     * @param type $topic
+     * @param string $channel
+     * @param string $topic
      * @return int
      */
     public function topic($channel, $topic)
@@ -175,8 +175,8 @@ class User
      * Invite to channel
      * syntax: INVITE <nickname> <channel>
      *
-     * @param type $nickname
-     * @param type $channel
+     * @param string $nickname
+     * @param string $channel
      * return int
      */
     public function invite($nickname, $channel)
@@ -190,8 +190,8 @@ class User
      * set bot away on server
      * syntax: AWAY [<message>]
      *
-     * @param type $message
-     * @return type
+     * @param string $message
+     * @return int
      */
     public function away($message)
     {
@@ -204,8 +204,8 @@ class User
      * ping to server
      * syntax: PING <server1> [<server2>]
      * 
-     * @param type $message
-     * @return type
+     * @param string $message
+     * @return int
      */
     public function ping($message = '')
     {
