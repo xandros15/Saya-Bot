@@ -7,5 +7,5 @@ interface Logger
 
     public static function add($message, $type);
 
-    public function setLogger($filename, $path, $timezone);
+    public static function setLogger($filename, $path, $timezone);
 }
