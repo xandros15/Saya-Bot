@@ -19,6 +19,9 @@ class Server implements BotInterface\ServerController
     /** @var string */
     private $host;
 
+    /** @var int */
+    private $port;
+
     /** @var string */
     private $ports;
 
@@ -108,6 +111,16 @@ class Server implements BotInterface\ServerController
     }
 
     /**
+     * get current port
+     * 
+     * @return int
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    /**
      * return server password
      *
      * @return string
@@ -160,6 +173,7 @@ class Server implements BotInterface\ServerController
         while (($try--)) {
             $this->connection->connect($this->getHost(), current($ports));
             if ($this->connection->isConnected()) {
+                $this->port = current($ports);
                 return true;
             }
             if (next($ports) === false) {
