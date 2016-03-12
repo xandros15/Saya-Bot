@@ -17,7 +17,8 @@ class IRC
         NICK = 'NICK',
         IDENTIFY = 'IDENTIFY',
         PING = 'PING',
-        PONG = 'PONG';
+        PONG = 'PONG',
+        AWAY = 'AWAY';
     const
         USER = 'USER',
         PASSWORD = 'PASS';

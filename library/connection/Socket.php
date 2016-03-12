@@ -67,7 +67,7 @@ class Socket implements Connection
     public function isConnected()
     {
         $socket = $this->socket;
-        return (!is_resource($socket)) ? false : (!feof($socket) || !$this->isTimeout());
+        return (!is_resource($socket)) ? false : (!$this->isTimeout());
     }
 
     public function sendData($data)

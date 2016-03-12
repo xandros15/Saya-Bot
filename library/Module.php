@@ -84,15 +84,6 @@ abstract class Module
             if (!$command['action']) {
                 return;
             }
-            if (is_array($command['action']) && is_callable($command['action'])) {
-                if (($arguments = $this->getArguments($command)) !== false) {
-                    if (count($arguments) > 0) {
-                        call_user_func_array($command['action'], [$arguments]);
-                    } else {
-                        call_user_func($command['action']);
-                    }
-                }
-            }
             if (method_exists($this, $command['action'])) {
                 if (($arguments = $this->getArguments($command)) !== false) {
                     if (count($arguments) > 0) {
@@ -255,6 +246,7 @@ abstract class Module
                     [
                     'Accept-Language: en-US,en;q=0.8',
                     'Accept-Charset:UTF-8,*;q=0.5',
+                    'Accept: application/x.thpl.v1+json',
                     'User-Agent: Mozilla/5.0 (X11; Linux x86_64) ' .
                     'AppleWebKit/537.36 (KHTML, like Gecko) ' .
                     'Ubuntu Chromium/36.0.1985.125 ' .

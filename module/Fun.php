@@ -21,7 +21,6 @@ class Fun extends \Library\Module
         RATING_QUESTIONABLE = 'q';
 
     private
-        $kierCount = 0,
         $rateOption = [
             'NSFW' => 'rating:explicit',
             'SAFE' => 'rating:safe',
@@ -38,9 +37,13 @@ class Fun extends \Library\Module
             'action' => 'c',
             'arguments' => -1,
             'determiter' => ',',
-            'help' => 'Randomize arguments. Determiter is set as ",". Example: "!c apple, banana, oranges".'
+            'help' => 'Randomize arguments. Determiter is set as ",". Example: "!c apple, banana, oranges".',
+            'ban'=> [
+                'host' => 'FBF0D8DB.5BE561A6.7DCB3F4E.IP'
+            ]
+
         ]);
-        
+
         $this->setCommand([
             'trigger' => 'random',
             'action' => 'random',
@@ -53,7 +56,7 @@ class Fun extends \Library\Module
                 'nick' => 'Thebassa'
             ]
         ]);
-        
+
         $this->setCommand([
             'trigger' => 'biba',
             'reply' => 'Biba dance: https://www.youtube.com/watch?v=kpJcgkEdMRg'
@@ -67,27 +70,27 @@ class Fun extends \Library\Module
             'trigger' => 'mikuluka',
             'reply' => 'https://www.youtube.com/watch?v=ZllY2wBLYN4'
         ]);
-        
+
         $this->setCommand([
             'trigger' => 'rolypoly',
             'reply' => 'Roly-poly: http://www.youtube.com/watch?v=3Xolk2cFzlo'
         ]);
-        
+
         $this->setCommand([
             'trigger' => 'weaboo',
             'reply' => 'Weaboo song: https://www.youtube.com/watch?v=TBfWKmRFTjM'
         ]);
-        
+
         $this->setCommand([
             'trigger' => 'xandros',
             'reply' => '[9:58pm] <Inkwizytor> xandros, kup sobie slownik'
         ]);
-        
+
         $this->setCommand([
             'trigger' => 'cycki',
             'action' => 'cycki'
         ]);
-        
+
 
         parent::loadSettings($this);
     }
@@ -95,9 +98,9 @@ class Fun extends \Library\Module
     protected function cycki()
     {
         $stream = $this->loadStreamUrl('http://api.oboobs.ru/noise/1/');
-        $json = json_decode($stream);
+        $json   = json_decode($stream);
         if (!empty($json[0])) {
-            $json = $json[0];
+            $json    = $json[0];
             $message = IRCHelper::colorText('Tits', IRCHelper::COLOR_ORANGE) . ': ';
             $message .= IRCHelper::colorText('NSFW', IRCHelper::COLOR_PINK) . ' ';
             $message .= 'http://media.oboobs.ru/' . $json->preview;
@@ -109,9 +112,8 @@ class Fun extends \Library\Module
 
     protected function c(array $arguments = [])
     {
-        $numberOfArguments = count($arguments);
-        if ($numberOfArguments >= 2) {
-            $this->reply(trim($arguments[mt_rand(0, $numberOfArguments - 1)]));
+        if (count(array_unique(array_map('trim', $arguments))) >= 2) {
+            $this->reply(trim($arguments[mt_rand(0, count($arguments) - 1)]));
         } else {
             $this->reply('Wrong arguments. Type "!Help c" to help');
         }
@@ -121,8 +123,14 @@ class Fun extends \Library\Module
     {
         $arguments = $this->setApi($arguments);
         $arguments = $this->setRate($arguments);
+        if (!$arguments) {
+            return false;
+        }
+
+
+
         $tags = array_map('strtolower', array_merge($arguments, [$this->rate]));
-        $url = $this->api . 'tags=' . trim(implode('+', $tags));
+        $url  = $this->api . 'tags=' . trim(implode('+', $tags));
         $html = $this->loadStreamUrl($url);
         if (!$html) {
             return $this->reply('I can\'t open api url.');
@@ -143,7 +151,7 @@ class Fun extends \Library\Module
             ->getAttribute('count');
 
         $random = mt_rand(0, $count - 1);
-        $pid = floor($random / 100);
+        $pid    = floor($random / 100);
 
         switch ($this->api) {
             case self::API_GEL:
@@ -158,9 +166,10 @@ class Fun extends \Library\Module
             return $this->reply('Can\'t load html to dom.');
         }
         $image = json_decode($newHtml)[$random % 100];
-        $url = $this->shortIt($image->file_url, ($this->api == self::API_GEL) ?
+        $url   = $this->shortIt($image->file_url,
+            ($this->api == self::API_GEL) ?
                 $image->hash : $image->md5);
-        $warn = '';
+        $warn  = '';
         switch ($image->rating) {
             case self::RATING_NSFW:
                 $warn = IRCHelper::colorText('NSFW', IRCHelper::COLOR_PINK);
@@ -229,8 +238,8 @@ class Fun extends \Library\Module
             }
         }
         if (empty($arguments)) {
-            $this->reply('Maybe loli?');
-            $arguments[] = 'loli';
+            $this->reply('What are you looking for? Type "!random" <tags>');
+            return false;
         }
         return $arguments;
     }

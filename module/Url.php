@@ -48,6 +48,11 @@ class Url extends \Library\Module
         libxml_use_internal_errors(true);
     }
 
+    public static function getRegexUrl()
+    {
+        return '_^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS';
+    }
+
     /**
      * Main function to execute when listen even occurs
      */
@@ -68,8 +73,17 @@ class Url extends \Library\Module
             if (!$title) {
                 continue;
             }
-            $this->reply($this->addNsfw($arguments, $nr, $title));
+            $title = $this->trimtext($title, 300);
+            $title = $this->addNsfw($arguments, $nr, $title);
+            $this->reply($title);
         }
+    }
+    private function trimtext($text, $lenght)
+    {
+        if(strlen($text) > $lenght){
+           return mb_substr($text, 0, $lenght - 5) . '(...)';
+        }
+        return $text;
     }
 
     private function addNsfw(array $arguments, $nr, $title)
@@ -98,7 +112,6 @@ class Url extends \Library\Module
 
         $link = (stripos($link, 'http') !== 0) ? 'http://' . $link : $link;
 
-
         foreach ($this->except as $page => $opt) {
             if (stristr($link, $page) !== false && $opt == 'pass') {
                 return $link;
@@ -107,21 +120,7 @@ class Url extends \Library\Module
                 return false;
             }
         }
-
-        $parse = parse_url($link);
-        if (empty($parse['host'])) {
-            return false;
-        }
-        if (filter_var($parse['host'], FILTER_VALIDATE_IP)) {
-            return $link;
-        } else {
-            if (($dotpos = strrpos($parse['host'], '.')) === false) {
-                return false; 
-            }
-            $len    = strlen($parse['host']);
-            $domain = strtoupper(substr($parse['host'], $dotpos - $len + 1));
-            return (in_array($domain, UrlHelper::domainList())) ? $link : false;
-        }
+        return (preg_match(self::getRegexUrl(), $link)) ? $link : false;
     }
 
     public function getKeywords()

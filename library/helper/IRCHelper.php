@@ -1,7 +1,15 @@
 <?php
 
 namespace Library\Helper;
-
+/* @todo
+ * change colors method
+ * 1. method chaining
+ *      $helper->orange('Romaji')->gray(": $unit->original")->pink('NSFW')->gray(':)
+ * 2. nazewnictwo
+ *
+ * 3. parser
+ *       "@red{Romaji}: {$unit->original} @pink{NSFW}: "
+ */
 class IRCHelper
 {
     const

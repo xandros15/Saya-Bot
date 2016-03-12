@@ -39,11 +39,12 @@ class Configuration
         }
 
         $nameBotConfig = (!empty($server)) ? $server : DEFAULT_CONFIG;
-        if (file_exists(ROOT_DIR . '/settings/config.' . $nameBotConfig . '.json')) {
-            $config = file_get_contents(ROOT_DIR . '/settings/config.' . $nameBotConfig . '.json');
+        if (file_exists(ROOT_DIR . '/Settings/config.' . $nameBotConfig . '.json')) {
+            $config = file_get_contents(ROOT_DIR . '/Settings/config.' . $nameBotConfig . '.json');
         } else {
             die('Not found config file');
         }
+        //todo throw error if config is no corrected
         $config = json_decode($config);
         static::$serverName = (string) strtolower($nameBotConfig);
         static::$server = (string) $config->server;
