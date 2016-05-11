@@ -91,6 +91,15 @@ class Fun extends Module
             'trigger' => 'cycki',
             'action' => 'cycki'
         ]);
+        $this->setCommand([
+            'action' => function () {
+                $this->user->mode($this->bot->getSource(),'+b', 'Thebassa');
+                $this->user->kick($this->bot->getSource(), 'Thebassa', 'nie jestem zawiedziona');
+            },
+            'trigger' => 'baka',
+            'permit' => true,
+        ]);
+
 
 
         parent::loadSettings($this);
