@@ -93,7 +93,7 @@ class Fun extends Module
         ]);
         $this->setCommand([
             'action' => function () {
-                $this->user->mode($this->bot->getSource(),'+b', 'Thebassa');
+                $this->user->mode($this->bot->getSource(),'+b', ['Thebassa']);
                 $this->user->kick($this->bot->getSource(), 'Thebassa', 'nie jestem zawiedziona');
             },
             'trigger' => 'baka',
