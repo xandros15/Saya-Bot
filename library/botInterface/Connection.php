@@ -8,7 +8,7 @@ interface Connection
 
     public function getPort();
 
-    public function connect($server, $port);
+    public function connect($host, $port);
 
     public function disconnect();
 
