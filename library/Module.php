@@ -2,6 +2,7 @@
 
 namespace library;
 
+use Closure;
 use DOMDocument;
 use Exception;
 use library\Bot;
@@ -96,7 +97,7 @@ abstract class Module
             if (!$command['action']) {
                 return;
             }
-            if (is_callable($command['action'])) {
+            if (($command['action']) instanceof Closure) {
                 $command['action']($this->getArguments($command));
             } elseif (method_exists($this, $command['action'])) {
                 if (($arguments = $this->getArguments($command)) !== false) {
