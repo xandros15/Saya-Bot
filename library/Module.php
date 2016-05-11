@@ -25,17 +25,28 @@ abstract class Module
         FILE_SAVE = 'SAVE',
         FILE_LOAD = 'LOAD';
 
-    protected
-        /** @var \library\Bot */
-        $bot = null,
-        $commands = [],
-        $executeTime = [],
-        $httpHeader = [];
+
+    /**
+     * @var \library\Bot
+     */
+    protected $bot = null;
+    /**
+     * @var User
+     */
+    protected $user;
+    protected $commands = [];
+    protected $executeTime = [];
+    protected $httpHeader = [];
     static protected $dbConfig = null;
 
     public function __toString()
     {
         return get_class($this);
+    }
+
+    public function setUser(User $user)
+    {
+        $this->user = $user;
     }
 
     public function __construct()
@@ -102,7 +113,7 @@ abstract class Module
         if (!static::$dbConfig) {
             $dbConfigFile = implode(DIRECTORY_SEPARATOR, [ROOT_DIR, SETTING_FOLDER, self::DB_CONFIG_NAME]);
             if (!file_exists($dbConfigFile)) {
-               throw new Exception('Don\'t found a config filename:' . $dbConfigFile);
+                throw new Exception('Don\'t found a config filename:' . $dbConfigFile);
             }
             $dbConfig = static::$dbConfig = json_decode(file_get_contents($dbConfigFile));
         }

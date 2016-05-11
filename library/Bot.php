@@ -2,6 +2,7 @@
 
 namespace library;
 
+use library\Module;
 use library\Server;
 use library\Configuration as Config;
 use library\Filter;
@@ -9,7 +10,6 @@ use library\constants\IRC;
 use ReflectionClass;
 use Exception;
 use library\debugger\Logger;
-use library\Module;
 
 /* Interfaces */
 
@@ -213,6 +213,8 @@ class Bot
     private function loadModule(array $module)
     {
         $namespace = 'module';
+        $user = new User($this->server);
+
         foreach ($module as $moduleName) {
             Logger::add('load ' . $moduleName . ' module', Logger::INFO); //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
             $reflector = new ReflectionClass("{$namespace}\\{$moduleName}");
@@ -223,6 +225,7 @@ class Bot
             }
             $this->module[$name] = $instance;
             $this->module[$name]->setIRCBot($this);
+            $this->module[$name]->setUser($user);
             $this->module[$name]->loadSettings();
             echo Logger::add('done', Logger::INFO);
         }

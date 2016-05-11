@@ -2,6 +2,7 @@
 
 namespace library;
 
+use library\Constants\IRC;
 use library\Server;
 
 class User
@@ -42,11 +43,19 @@ class User
      * same as say, just reply message
      *
      * @param int $message
+     * @param string $type
      * @return int
      */
-    public function sayR($message)
+    public function reply($message, $type = IRC::PRIVMSG)
     {
-        return $this->say($this->server->getTextline()->getSource(), $message);
+        switch ($type) {
+            case IRC::PRIVMSG:
+                $this->say($this->server->getTextline()->getSource(), $message);
+                return;
+            case IRC::NOTICE:
+                $this->notice($this->server->getTextline()->getSource(), $message);
+                return;
+        }
     }
 
     /**
@@ -70,7 +79,7 @@ class User
      * @param int $message
      * @return int
      */
-    public function noticeR($message)
+    public function replyNotice($message)
     {
         return $this->notice($this->server->getTextline()->getSource(), $message);
     }
@@ -169,10 +178,10 @@ class User
     public function mode($nameOrChan, $flags, array $args)
     {
         if (is_array($args)) {
-            $args = explode(' ', $args);
+            $args = implode(' ', $args);
         }
 
-        $data = spintf('MODE %s %s %s', $nameOrChan, $flags, $args);
+        $data = sprintf('MODE %s %s %s', $nameOrChan, $flags, $args);
 
         return $this->server->sendData($data);
     }
@@ -199,7 +208,7 @@ class User
      *
      * @param string $nickname
      * @param string $channel
-     * return int
+     * @return int
      */
     public function invite($nickname, $channel)
     {
@@ -225,13 +234,13 @@ class User
     /**
      * ping to server
      * syntax: PING <server1> [<server2>]
-     * 
+     *
      * @param string $message
      * @return int
      */
     public function ping($message = '')
     {
-        $message ? : sprintf('%s:%s', $this->server->getHost(), $this->server->getPort());
+        $message ?: sprintf('%s:%s', $this->server->getHost(), $this->server->getPort());
 
         $data = sprintf('PING %s', $message);
 
