@@ -96,7 +96,9 @@ abstract class Module
             if (!$command['action']) {
                 return;
             }
-            if (method_exists($this, $command['action'])) {
+            if (is_callable($command['action'])) {
+                $command['action']($this->getArguments($command));
+            } elseif (method_exists($this, $command['action'])) {
                 if (($arguments = $this->getArguments($command)) !== false) {
                     if (count($arguments) > 0) {
                         call_user_func_array([$this, $command['action']], [$arguments]);
