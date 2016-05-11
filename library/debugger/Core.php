@@ -11,7 +11,7 @@ class Core
 {
     const
         ERROR = 1,
-        WARRNING = 2,
+        WARNING = 2,
         INFO = 3,
         SUCCESS = 4;
 
@@ -117,7 +117,7 @@ class Core
 
         switch ($type) {
             case Logger::ERROR: return $prefix .= ' (!ERROR): ';
-            case Logger::WARRNING: return $prefix .= ' (WARNING): ';
+            case Logger::WARNING: return $prefix .= ' (WARNING): ';
             case Logger::INFO: return $prefix .= ' (INFO): ';
             case Logger::SUCCESS: return $prefix .= ' (SUCCESS): ';
         }

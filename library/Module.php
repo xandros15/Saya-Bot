@@ -4,11 +4,11 @@ namespace library;
 
 use DOMDocument;
 use Exception;
+use library\Bot;
 use library\helper\UrlHelper;
 use library\FunctionHash;
 use library\Configuration as Config;
 use library\constants\IRC;
-use library\Bot;
 use R;
 use ReflectionClass;
 
@@ -26,7 +26,7 @@ abstract class Module
         FILE_LOAD = 'LOAD';
 
     protected
-        /** @var \Library\Bot */
+        /** @var \library\Bot */
         $bot = null,
         $commands = [],
         $executeTime = [],
@@ -102,7 +102,7 @@ abstract class Module
         if (!static::$dbConfig) {
             $dbConfigFile = implode(DIRECTORY_SEPARATOR, [ROOT_DIR, SETTING_FOLDER, self::DB_CONFIG_NAME]);
             if (!file_exists($dbConfigFile)) {
-                new Exception('Don\'t found a config filename:' . $dbConfigFile);
+               throw new Exception('Don\'t found a config filename:' . $dbConfigFile);
             }
             $dbConfig = static::$dbConfig = json_decode(file_get_contents($dbConfigFile));
         }
