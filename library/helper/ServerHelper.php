@@ -2,13 +2,15 @@
 
 namespace library\helper;
 
+use Exception;
+
 class ServerHelper
 {
 
     /**
-     * 
      * @param string $ports
      * @return array
+     * @throws Exception
      */
     static public function parsePorts($ports)
     {

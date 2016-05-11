@@ -2,6 +2,7 @@
 
 namespace library;
 
+use Exception;
 use library\chatter\Textline;
 use library\chatter\MessageRelay;
 use library\connection\Socket;
@@ -153,9 +154,9 @@ class Server implements ServerController
     }
 
     /**
-     * connect to server
-     *
-     * @return boolean
+     * Connect to server
+     * @return bool
+     * @throws Exception
      */
     public function connect()
     {
