@@ -4,9 +4,9 @@ namespace library;
 
 class Configuration
 {
-    const
-        APPLICATION_NAME = 'Saya Bot',
-        DEFAULT_TIMEZONE = 'Europe/Warsaw';
+    const APPLICATION_NAME = 'Saya Bot';
+    const DEFAULT_TIMEZONE = 'Europe/Warsaw';
+    const VERSION = '=== alpha === https://github.com/xandros15/Saya-Bot';
 
     public static
         $serverName = '',
