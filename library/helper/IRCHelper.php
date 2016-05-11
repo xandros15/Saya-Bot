@@ -1,6 +1,7 @@
 <?php
 
-namespace Library\Helper;
+namespace library\helper;
+
 /* @todo
  * change colors method
  * 1. method chaining
@@ -30,8 +31,25 @@ class IRCHelper
         COLOR_LIGHT_GRAY = 15,
         COLOR_WHITE = 16;
 
+    public static function __callStatic($name, $arguments)
+    {
+        if (substr($name, 0, 4) == 'text') {
+
+            $colorConst = 'self::COLOR_' . strtoupper(StringHelper::fromCamelCase(substr($name, 4)));
+            if (!defined($colorConst)) {
+                throw new \BadMethodCallException();
+            }
+
+            return self::colorText($arguments[0], constant($colorConst));
+        }
+
+        throw new \BadMethodCallException();
+
+    }
+
+
     /**
-     * 
+     *
      * @param string $text
      * @param int $color
      * @return string
@@ -44,7 +62,7 @@ class IRCHelper
     }
 
     /**
-     * 
+     *
      * @param string $text
      * @param int $color
      * @param int $numberOfBorderLetters

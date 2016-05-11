@@ -5,16 +5,16 @@
  * and open the template in the editor.
  */
 
-namespace Module;
+namespace module;
 
-use Library\Module;
+use library\Module;
 
 /**
  * Description of Commands
  *
  * @author ASUS
  */
-class Commands extends \Library\Module
+class Commands extends Module
 {
     const
         TRIGGER_ADD = 'add',

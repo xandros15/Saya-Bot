@@ -13,7 +13,7 @@ defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 /* @var $loader Composer\Autoload\ClassLoader */
 $loader = require (ROOT_DIR . '/vendor/autoload.php');
 
-$loader->addPsr4('Library\\', ROOT_DIR . '/Library');
-$loader->addPsr4('Module\\', ROOT_DIR . '/Module');
+$loader->addPsr4('library\\', ROOT_DIR . '/library');
+$loader->addPsr4('module\\', ROOT_DIR . '/module');
 /* Run */
-(new \Library\Bot())->startBot();
+(new \library\Bot())->startBot();

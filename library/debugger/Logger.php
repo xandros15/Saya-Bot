@@ -1,9 +1,9 @@
 <?php
 
-namespace Library\Debugger;
+namespace library\Debugger;
 
-use Library\Debugger\Core;
-use Library\BotInterface\Logger as LoggerInterface;
+use library\debugger\Core;
+use library\botInterface\Logger as LoggerInterface;
 use Exception;
 
 class Logger extends Core implements LoggerInterface

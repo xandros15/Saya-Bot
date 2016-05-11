@@ -1,14 +1,15 @@
 <?php
 
-namespace Library;
+namespace library;
 
-use Library\Server;
-use Library\Configuration as Config;
-use Library\Filter;
-use Library\Constants\IRC;
+use library\Server;
+use library\Configuration as Config;
+use library\Filter;
+use library\constants\IRC;
 use ReflectionClass;
 use Exception;
-use Library\Debugger\Logger;
+use library\debugger\Logger;
+use library\Module;
 
 /* Interfaces */
 
@@ -211,13 +212,13 @@ class Bot
 
     private function loadModule(array $module)
     {
-        $namespace = 'Module';
+        $namespace = 'module';
         foreach ($module as $moduleName) {
             Logger::add('load ' . $moduleName . ' module', Logger::INFO); //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
             $reflector = new ReflectionClass("{$namespace}\\{$moduleName}");
             $instance = $reflector->newInstance();
             $name = $reflector->getShortName();
-            if (!$instance instanceof \Library\Module) {
+            if (!$instance instanceof Module) {
                 throw new Exception();
             }
             $this->module[$name] = $instance;

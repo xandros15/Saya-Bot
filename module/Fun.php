@@ -1,12 +1,13 @@
 <?php
 
-namespace Module;
+namespace module;
 
-use Library\Constants\IRC;
-use Library\Helper\IRCHelper;
+use library\constants\IRC;
+use library\helper\IRCHelper;
 use R;
+use library\Module;
 
-class Fun extends \Library\Module
+class Fun extends Module
 {
     const
         API_GEL = 'http://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=100&',

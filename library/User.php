@@ -1,8 +1,8 @@
 <?php
 
-namespace Library;
+namespace library;
 
-use Library\Server;
+use library\Server;
 
 class User
 {

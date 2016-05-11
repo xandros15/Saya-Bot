@@ -1,6 +1,6 @@
 <?php
 
-namespace Library\Chatter;
+namespace library\Chatter;
 
 class MessageRelay
 {

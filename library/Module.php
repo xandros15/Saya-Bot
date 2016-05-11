@@ -1,13 +1,14 @@
 <?php
 
-namespace Library;
+namespace library;
 
 use DOMDocument;
 use Exception;
-use Library\Helper\UrlHelper;
-use Library\FunctionHash;
-use Library\Configuration as Config;
-use Library\Constants\IRC;
+use library\helper\UrlHelper;
+use library\FunctionHash;
+use library\Configuration as Config;
+use library\constants\IRC;
+use library\Bot;
 use R;
 use ReflectionClass;
 
@@ -15,7 +16,7 @@ abstract class Module
 {
     const
         DB_CONFIG_NAME = 'db.json',
-        SETTING_PATHNAME = 'Module/settings';
+        SETTING_PATHNAME = 'module/settings';
     const
         CHECK_BAN = 'BAN',
         CHECK_CHAN = 'CHAN',
@@ -25,11 +26,11 @@ abstract class Module
         FILE_LOAD = 'LOAD';
 
     protected
-    /** @var \Library\Bot */
-        $bot             = null,
-        $commands        = [],
-        $executeTime     = [],
-        $httpHeader      = [];
+        /** @var \Library\Bot */
+        $bot = null,
+        $commands = [],
+        $executeTime = [],
+        $httpHeader = [];
     static protected $dbConfig = null;
 
     public function __toString()
@@ -103,7 +104,7 @@ abstract class Module
             if (!file_exists($dbConfigFile)) {
                 new Exception('Don\'t found a config filename:' . $dbConfigFile);
             }
-            $dbConfig         = static::$dbConfig = json_decode(file_get_contents($dbConfigFile));
+            $dbConfig = static::$dbConfig = json_decode(file_get_contents($dbConfigFile));
         }
         if (!$object || !method_exists($object, 'propertyToSave')) {
             return;
@@ -135,12 +136,12 @@ abstract class Module
             return;
         }
         $settings = $this->propertyToSave();
-        $json     = json_encode($settings, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $json = json_encode($settings, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
 
         return $this->settingFile(self::FILE_SAVE, $json);
     }
 
-    public function setIRCBot(\Library\Bot $ircBot)
+    public function setIRCBot(Bot $ircBot)
     {
         $this->bot = $ircBot;
     }
@@ -193,8 +194,8 @@ abstract class Module
     {
         foreach ($this->bot->module as $module) {
             if (isset($module->commands[$command[$command['trigger']]])) {
-                $oldCommand                          = $module->commands[$command['trigger']];
-                $newCommand                          = array_replace_recursive($oldCommand, $command);
+                $oldCommand = $module->commands[$command['trigger']];
+                $newCommand = array_replace_recursive($oldCommand, $command);
                 $this->commands[$command['trigger']] = $newCommand;
                 echo "Command {$command['trigger']} was edited" . PHP_EOL;
                 return true;
@@ -207,7 +208,7 @@ abstract class Module
     protected function getArguments($command)
     {
         $lenTrigger = strlen($command['trigger']) + strlen(Config::$commandPrefix);
-        $offtext    = trim(substr($this->bot->getMessage(), $lenTrigger));
+        $offtext = trim(substr($this->bot->getMessage(), $lenTrigger));
         $determiter = ($command['determiter']) ? $command['determiter'] : ' ';
         if ($offtext === '') {
             $arguments = [];
@@ -240,27 +241,27 @@ abstract class Module
     {
         $opts = [
             'http' =>
-            [
-                'timeout' => 15,
-                'header' => implode("\r\n",
-                    [
-                    'Accept-Language: en-US,en;q=0.8',
-                    'Accept-Charset:UTF-8,*;q=0.5',
-                    'Accept: application/x.thpl.v1+json',
-                    'User-Agent: Mozilla/5.0 (X11; Linux x86_64) ' .
-                    'AppleWebKit/537.36 (KHTML, like Gecko) ' .
-                    'Ubuntu Chromium/36.0.1985.125 ' .
-                    'Chrome/36.0.1985.125 Safari/537.36'
-                ]),
-                'ignore_errors' => true,
-            ],
+                [
+                    'timeout' => 15,
+                    'header' => implode("\r\n",
+                        [
+                            'Accept-Language: en-US,en;q=0.8',
+                            'Accept-Charset:UTF-8,*;q=0.5',
+                            'Accept: application/x.thpl.v1+json,text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                            'User-Agent: Mozilla/5.0 (X11; Linux x86_64) ' .
+                            'AppleWebKit/537.36 (KHTML, like Gecko) ' .
+                            'Ubuntu Chromium/36.0.1985.125 ' .
+                            'Chrome/36.0.1985.125 Safari/537.36'
+                        ]),
+                    'ignore_errors' => true,
+                ],
             'ssl' => [
                 'verify_peer' => false
             ]
         ];
         if ($login) {
-            $auth                   = sprintf('%s:%s', $login['login'], $login['key']);
-            $encodedAuth            = base64_encode($auth);
+            $auth = sprintf('%s:%s', $login['login'], $login['key']);
+            $encodedAuth = base64_encode($auth);
             $opts['http']['header'] = $encodedAuth . "\r\n" . $opts['http']['header'];
         }
 
@@ -289,8 +290,8 @@ abstract class Module
 
     protected function getDOM()
     {
-        $dom                      = new DOMDocument;
-        $dom->recover             = true;
+        $dom = new DOMDocument;
+        $dom->recover = true;
         $dom->strictErrorChecking = false;
         return $dom;
     }
@@ -311,18 +312,18 @@ abstract class Module
         } elseif ($callback instanceof \Closure) {
             $callbackId = FunctionHash::from($callback);
         } elseif (method_exists($this, $callback)) {
-            $callback   = [$this, $callback];
+            $callback = [$this, $callback];
             $callbackId = "{$callback[0]}\\{$callback[1]}";
         } else {
             throw new Exception("Can't call function in {$this} class. Callback no exists or isn't callable.");
         }
         if (is_null($event)) {
             return $this->registerTimeFunction([
-                    'id' => $callbackId,
-                    'callback' => $callback,
-                    'delay' => $delay,
-                    'time' => time(),
-                    'arguments' => $arguments
+                'id' => $callbackId,
+                'callback' => $callback,
+                'delay' => $delay,
+                'time' => time(),
+                'arguments' => $arguments
             ]);
         }
 
@@ -349,11 +350,12 @@ abstract class Module
         if (isset(static::$listener[$functionOptions['id']])) {
             return false;
         }
-        $id                    = $functionOptions['id'];
+        $id = $functionOptions['id'];
         unset($functionOptions['id']);
         static::$listener[$id] = $functionOptions;
         return $id;
     }
+
     protected static $listener = [];
 
     public static function executeListener()
@@ -398,8 +400,9 @@ abstract class Module
                 if (!$command['permit']) {
                     return true;
                 }
+                $host = preg_replace('/[\x01-\x1f](?:\d{1,2})?/', '', $this->bot->getUserHost());
                 foreach (Config::$permit as $permit) {
-                    if ($this->bot->getUserHost() == $permit) {
+                    if ($host == $permit) {
                         return true;
                     }
                 }
@@ -408,35 +411,35 @@ abstract class Module
     }
 
     /**
-     * 
+     *
      * @param string $dbname
      * @param boolean $frozen
      * @return void
      */
     protected static function RedBeanConnect($dbname, $frozen = true)
     {
-        require_once (implode(DIRECTORY_SEPARATOR, [ROOT_DIR, 'Library', 'database', 'rb.php']));
+        require_once(implode(DIRECTORY_SEPARATOR, [ROOT_DIR, 'library', 'database', 'rb.php']));
         if (isset(R::$toolboxes[$dbname])) {
             R::selectDatabase($dbname);
         } else {
             $dbConfig = static::$dbConfig;
             switch (strtoupper($dbConfig->type)) {
                 case 'SQLITE':
-                    $dns                = sprintf('sqlite:/tmp/%s.sqlite3', $dbname);
-                    $dbConfig->user     = $dbConfig->password = null;
+                    $dns = sprintf('sqlite:/tmp/%s.sqlite3', $dbname);
+                    $dbConfig->user = $dbConfig->password = null;
                     break;
                 case 'MARIA':
-                    $host               = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
-                    $dns                = sprintf('mysql:host=%s;dbname=%s', $host, $dbname);
+                    $host = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
+                    $dns = sprintf('mysql:host=%s;dbname=%s', $host, $dbname);
                     break;
                 case 'POSTGRESQL':
-                    $host               = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
-                    $dns                = sprintf('pgsql:host=%s;dbname=%s', $host, $dbname);
+                    $host = ($dbConfig->port) ? sprintf('%s:%d', $dbConfig->host, $dbConfig->port) : $dbConfig->host;
+                    $dns = sprintf('pgsql:host=%s;dbname=%s', $host, $dbname);
                     break;
                 case null:
                 default :
-                    $dns                = null;
-                    $dbConfig->user     = $dbConfig->password = null;
+                    $dns = null;
+                    $dbConfig->user = $dbConfig->password = null;
             }
             R::addDatabase($dbname, $dns, $dbConfig->user, $dbConfig->password, $frozen);
             R::selectDatabase($dbname);
@@ -446,17 +449,17 @@ abstract class Module
 
     private function settingFile($mode, $content = null, $object = null)
     {
-        $object   = ($object) ? $object : $this;
+        $object = ($object) ? $object : $this;
         $filename = (new ReflectionClass($object))->getShortName() . '.json';
         switch ($mode) {
             case self::FILE_LOAD;
                 $pathname = implode(DIRECTORY_SEPARATOR,
                     [
-                    ROOT_DIR,
-                    self::SETTING_PATHNAME,
-                    Config::getServerName(),
-                    $filename
-                ]);
+                        ROOT_DIR,
+                        self::SETTING_PATHNAME,
+                        Config::getServerName(),
+                        $filename
+                    ]);
                 if (!file_exists($pathname)) {
                     return false;
                 }
@@ -464,10 +467,10 @@ abstract class Module
             case self::FILE_SAVE;
                 $pathname = implode(DIRECTORY_SEPARATOR,
                     [
-                    ROOT_DIR,
-                    self::SETTING_PATHNAME,
-                    Config::getServerName()
-                ]);
+                        ROOT_DIR,
+                        self::SETTING_PATHNAME,
+                        Config::getServerName()
+                    ]);
                 if (!is_dir($pathname)) {
                     mkdir($pathname, 0755, true);
                 }

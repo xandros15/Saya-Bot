@@ -1,6 +1,6 @@
 <?php
 
-namespace Library\BotInterface;
+namespace library\botInterface;
 
 interface ServerController
 {

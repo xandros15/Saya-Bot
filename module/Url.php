@@ -4,10 +4,11 @@
 namespace Module;
 
 use DOMXPath;
-use Library\Constants\IRC;
-use Library\Helper\IRCHelper;
-use Library\Helper\UrlHelper;
+use library\constants\IRC;
+use library\helper\IRCHelper;
+use library\helper\UrlHelper;
 use RuntimeException;
+use library\Module;
 
 /**
  *

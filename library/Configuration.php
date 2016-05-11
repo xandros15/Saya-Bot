@@ -1,6 +1,6 @@
 <?php
 
-namespace Library;
+namespace library;
 
 class Configuration
 {
@@ -39,8 +39,8 @@ class Configuration
         }
 
         $nameBotConfig = (!empty($server)) ? $server : DEFAULT_CONFIG;
-        if (file_exists(ROOT_DIR . '/Settings/config.' . $nameBotConfig . '.json')) {
-            $config = file_get_contents(ROOT_DIR . '/Settings/config.' . $nameBotConfig . '.json');
+        if (file_exists(ROOT_DIR . '/settings/config.' . $nameBotConfig . '.json')) {
+            $config = file_get_contents(ROOT_DIR . '/settings/config.' . $nameBotConfig . '.json');
         } else {
             die('Not found config file');
         }

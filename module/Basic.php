@@ -11,12 +11,13 @@
  * @author ASUS
  */
 
-namespace Module;
+namespace module;
 
-use Library\Constants\IRC;
-use Library\Configuration as Config;
+use library\Module;
+use library\constants\IRC;
+use library\configuration as Config;
 
-class Basic extends \Library\Module
+class Basic extends Module
 {
     const
         NICKSERV = 'NickServ',

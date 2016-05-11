@@ -12,7 +12,9 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
-        "symfony/process": "*",
-        "league/climate": "dev-master"
+        "symfony/process": "*"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^3.0"
     }
 }

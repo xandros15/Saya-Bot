@@ -1,8 +1,8 @@
 <?php
 
-namespace Library\Connection;
+namespace library\Connection;
 
-use Library\BotInterface\Connection;
+use library\botInterface\Connection;
 
 class Socket implements Connection
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Library\Debugger;
+namespace library\Debugger;
 
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Library\Debugger\Logger;
+use library\debugger\Logger;
 
 class Core
 {

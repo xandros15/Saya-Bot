@@ -1,6 +1,6 @@
 <?php
 
-namespace Library\Constants;
+namespace library\Constants;
 
 class IRC
 {

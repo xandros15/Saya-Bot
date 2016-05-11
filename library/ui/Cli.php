@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Library\Ui;
+namespace library\Ui;
 
 
 class Cli

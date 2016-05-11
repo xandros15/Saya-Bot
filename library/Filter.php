@@ -1,8 +1,8 @@
 <?php
 
-namespace Library;
+namespace library;
 
-use Library\Helper\IRCHelper;
+use library\helper\IRCHelper;
 use Symfony\Component\Process\Process;
 
 class Filter
@@ -71,8 +71,7 @@ class Filter
 
     public static function interbang($input)
     {
-        $interabang = "/(!|\?){3,}/";
-        if (preg_match_all($interabang, $input, $m)) {
+        if (preg_match_all('/(!|\?){3,}/', $input, $m)) {
             foreach ($m[0] as $i) {
                 $input = str_replace($i, substr($i, 0, 1)
                     . substr($i, strlen($i) / 2 + 1, 1)

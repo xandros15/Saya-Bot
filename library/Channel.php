@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Library;
+namespace library;
 
 class Channel
 {

@@ -1,11 +1,12 @@
 <?php
 
-namespace Module;
+namespace module;
 
-use Library\Constants\IRC;
-use Library\Configuration as Config;
+use library\constants\IRC;
+use library\configuration as Config;
+use library\Module;
 
-class Chatlog extends \Library\Module
+class Chatlog extends Module
 {
 
     public function execute()

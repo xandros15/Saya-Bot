@@ -4,12 +4,13 @@ namespace Module;
 
 use DateTimeZone;
 use DateTime;
-use Library\Constants\IRC;
-use Library\Configuration as Config;
-use Library\Helper\IRCHelper;
+use library\constants\IRC;
+use library\configuration as Config;
+use library\helper\IRCHelper;
 use stdClass;
+use library\Module;
 
-class Thpl extends \Library\Module
+class Thpl extends Module
 {
     const
         FILE_DATA_NAME = 'ThplData.json',

@@ -1,22 +1,24 @@
 <?php
 
-namespace Module;
+namespace module;
 
+use Library\Module;
 use R;
-use Library\Constants\IRC;
-use Library\Helper\IRCHelper;
+use library\Constants\IRC;
+use library\helper\IRCHelper as CT;
+use RedBeanPHP\OODBBean;
 
-class Aigis extends \Library\Module
+class Aigis extends Module
 {
     const
-        CLEAR_TIME = 60 * 1,
+        CLEAR_TIME = 20,
         DB_NAME = 'aigis',
         TB_NAME = 'unit',
         GALLERY_URL = 'http://aigisu.pl/image/%d';
 
     private
-        $lastRequest = [],
-        $unitList    = [];
+        $lastCgRequest = [],
+        $lastUnitRequest = [];
 
     public function loadSettings($object = null)
     {
@@ -30,7 +32,7 @@ class Aigis extends \Library\Module
             'trigger' => 'unit',
             'action' => 'unit',
             'determiter' => ' ',
-            'arguments' => 1,
+            'arguments' => -1,
             'channels' => ['#aigis'],
             'help' => 'Type "!unit {unit_name}" to get link to information about this unit.',
         ]);
@@ -49,13 +51,6 @@ class Aigis extends \Library\Module
             'channels' => ['#aigis'],
             'help' => 'Type "!dmm" to get link to info about current dmm event.',
         ]);
-        $this->setCommand([
-            'trigger' => 'setup',
-            'action' => 'setup',
-            'arguments' => 0,
-            'channels' => ['#aigis'],
-            'permit' => true
-        ]);
 
         parent::loadSettings($this);
     }
@@ -63,67 +58,191 @@ class Aigis extends \Library\Module
     protected function cg($arguments)
     {
         $request = trim($arguments[0]);
-        $request = rtrim($request, '!@#$%^&*()_-+={}[]:;\'"\\|<>,./?');
-        parent::RedBeanConnect(self::DB_NAME);
-        $units   = R::findAll(self::TB_NAME, '`name` like ?', [$request]);
-        if ($units) {
-            foreach ($units as $unit) {
-                if (!$unit->ownImageList) {
-                    continue;
-                }
-                $text = IRCHelper::colorText('Romaji', IRCHelper::COLOR_ORANGE) . ': ' . $unit->original;
-                $text .= ' ' . IRCHelper::colorText('NSFW', IRCHelper::COLOR_PINK) . ': ' . sprintf(self::GALLERY_URL,
-                        $unit->id);
-                $this->reply($text);
-            }
-        }
-        (isset($text)) || $this->reply('Not found ' . $request);
 
-        R::close();
+        if ($this->hasRequestDelay($request, $this->lastCgRequest)) {
+            return;
+        }
+
+        $units = $this->findUnitsViaName($request);
+
+        if (!$units) {
+            $this->reply($this->getProposition($request));
+            return;
+        }
+
+        if (!$this->hasOwnList($units, 'image')) {
+            $this->reply("I don't have this cg (yet?).");
+            return;
+        }
+
+        foreach ($units as $unit) {
+            if (!$unit->ownImageList) {
+                continue;
+            }
+
+            $uri = sprintf(self::GALLERY_URL, $unit->id);
+
+            $response = sprintf(
+                '%s: %s %s: %s',
+                CT::textOrange('Romanji'),
+                $unit->original,
+                CT::textPink('NSFW'),
+                $uri
+            );
+            $this->reply($response);
+        }
     }
 
     protected function unit($arguments)
     {
         $request = trim($arguments[0]);
-        $request = rtrim($request, '!@#$%^&*()_-+={}[]:;\'"\\|<>,./?');
-        foreach ($this->lastRequest as $id => $timeToClear) {
-            if ((time() - $timeToClear) >= self::CLEAR_TIME) {
-                unset($this->lastRequest[$id]);
-            }
+
+        if ($this->hasRequestDelay($request, $this->lastUnitRequest)) {
+            return;
         }
+
+        $units = $this->findUnitsViaName($request);
+
+        if (!$units) {
+            $this->reply($this->getProposition($request));
+            return;
+        }
+
+        //TODO: better unique link
+        $linkHolder = [];
+        foreach ($units as $unit) {
+            $link = (isset($arguments[1]) && strtolower($arguments[1]) == 'seesaw') ? $unit->link : $unit->linkgc;
+
+            if (!$link || isset($linkHolder[$link])) {
+                continue;
+            }
+
+            $linkHolder[$link] = true;
+
+            $response = sprintf(
+                '%s: %s %s: %s',
+                CT::textOrange('Romaji'),
+                $unit->original,
+                CT::textOrange('Link'),
+                $link
+            );
+
+            $this->reply($response);
+        }
+    }
+
+    const SIMILARLY_LEVEL = 60;
+    const MAX_SIMILAR = 5;
+
+    protected function getSimilar($request)
+    {
         parent::RedBeanConnect(self::DB_NAME);
-        $limit = ' LIMIT 5 ';
-        if (preg_match('/^[\x{30A0}-\x{30FF}\x{31F0}-\x{31FF}]+$/iu', $request)) {
-            $units = R::findAll(self::TB_NAME, "`original` like ? {$limit}", ["%{$request}%"]);
-        } else {
-            $units = R::findAll(self::TB_NAME, "`name` like ? {$limit}", [$request]);
-        }
-        if ($units) {
-            $linkHolder = [];
-            foreach ($units as $unit) {
-                if (!$unit->linkgc || isset($linkHolder[$unit->linkgc]) || isset($this->lastRequest[$unit->id])) {
-                    continue;
-                }
-                $linkHolder[$unit->linkgc]    = $unit->original;
-                $this->lastRequest[$unit->id] = time();
-
-                $text = IRCHelper::colorText('Romaji', IRCHelper::COLOR_ORANGE) . ': ' . $unit->original;
-                $text .= ' ' . IRCHelper::colorText('Link', IRCHelper::COLOR_ORANGE) . ': ' . $unit->linkgc;
-
-                $this->reply($text);
+        $unitNames = R::getCol('SELECT `name` FROM ' . self::TB_NAME);
+        $similarNames = [];
+        foreach ($unitNames as $name) {
+            similar_text($request, $name, $percent);
+            if ($percent >= self::SIMILARLY_LEVEL) {
+                $similarNames[$name] = $percent;
             }
+        }
+        ksort($similarNames);
+
+        R::close();
+        $mostSimilarNames = array_slice($similarNames, 0, self::MAX_SIMILAR);
+        return array_keys($mostSimilarNames);
+    }
+
+    protected function getProposition($request)
+    {
+        $similar = $this->getSimilar($request);
+
+        if (!$similar) {
+            $response = sprintf('Not found %s', $request);
+        } elseif (count($similar) == 1) {
+            $response = vsprintf('Did you mean %s?', $similar);
         } else {
-            $this->reply('Not found ' . $request);
+            $lastElement = array_pop($similar);
+            $response = sprintf('Did you mean %s or %s?',
+                implode(', ', $similar),
+                $lastElement
+            );
+        }
+        return $response;
+
+    }
+
+    protected function findUnitsViaName($name)
+    {
+        parent::RedBeanConnect(self::DB_NAME);
+
+        $limit = ' LIMIT 5 ';
+        if (preg_match('/^[\x{30A0}-\x{30FF}\x{31F0}-\x{31FF}]+$/iu', $name)) {
+            $units = R::findAll(self::TB_NAME, "`original` like ? {$limit}", ["%{$name}%"]);
+        } else {
+            $units = R::findAll(self::TB_NAME, "`name` like ? {$limit}", [$name]);
+        }
+
+        R::close();
+
+        return $units;
+    }
+
+    protected function hasOwnList($model, $ownListName)
+    {
+        parent::RedBeanConnect(self::DB_NAME);
+        $found = false;
+        $ownListName = strtolower($ownListName);
+        $ownListName = ucfirst($ownListName);
+        $property = "own{$ownListName}List";
+        if (is_array($model)) {
+            foreach ($model as $singleModel) {
+                if ($singleModel->{$property}) {
+                    $found = true;
+                    break;
+                }
+            }
+        } elseif ($model instanceof OODBBean) {
+            $found = (bool) ($model->{$property});
+        } else {
+            throw new \InvalidArgumentException('Var $model must be an array or instance of OODBean.');
         }
         R::close();
+
+        return $found;
+    }
+
+    protected function unsetRequestDelay(array &$list)
+    {
+        foreach ($list as $id => $timeToClear) {
+            if (time() >= $timeToClear) {
+                unset($list[$id]);
+            }
+        }
+    }
+
+    protected function setRequestDelay($id, array &$list)
+    {
+        $list[$id] = time() + self::CLEAR_TIME;
+    }
+
+    protected function hasRequestDelay($id, array &$list)
+    {
+        $this->unsetRequestDelay($list);
+        if (isset($list[$id])) {
+            return true;
+        }
+
+        $this->setRequestDelay($id, $list);
+
+        return false;
     }
 
     protected function getLinkToInfoDmmEvent()
     {
         $profileUrl = 'http://www.ulmf.org/bbs/member.php?u=65410';
-        $dom        = $this->getDOM();
+        $dom = $this->getDOM();
         $dom->loadHTML($this->loadStreamUrl($profileUrl));
-        $link       = $dom->getElementById('signature');
+        $link = $dom->getElementById('signature');
         if ($link) {
             $link = $link->getElementsByTagName('a')
                 ->item(0)
@@ -131,76 +250,18 @@ class Aigis extends \Library\Module
             if ($link) {
                 $this->reply("Dmm event info by Petite Soeur: {$link}");
             }
-        }else{
+        } else {
             $this->reply("Somethings wrong with dom.");
         }
     }
 
-    protected function setup()
-    {
-        $this->createUnitList();
-        $this->insertUnits();
-    }
-
-    private function createUnitList()
-    {
-        $stream = $this->loadStreamUrl('http://seesaawiki.jp/aigis/d/%a5%e6%a5%cb%a5%c3%a5%c8%b0%ec%cd%f7%c9%bd');
-        $doc    = $this->getDOM();
-
-        if (!$doc->loadHTML($stream)) {
-            echo 'error with load html' . PHP_EOL;
-            return false;
-        }
-        $result = $doc->getElementById('content_block_22')->getElementsByTagName('a');
-        if ($result->length) {
-            for ($i = 0; $i < $result->length; $i++) {
-                $http = $result->item($i)->attributes->getNamedItem('href')->nodeValue;
-                if (preg_match('~^http://seesaawiki.jp/aigis/d/(.*)$~', $http, $maches)) {
-                    $img      = $result->item($i)->firstChild;
-                    $linkgc   = 'http://aigis.gcwiki.info/?' . $maches[1];
-                    $title    = $img->attributes->getNamedItem('title');
-                    $original = ($title) ? $title->nodeValue : '';
-                    $icon     = $img->attributes->getNamedItem('src')->nodeValue;
-
-                    $unit                       = [
-                        'original' => $original,
-                        'icon' => $icon,
-                        'link' => $http,
-                        'linkgc' => $linkgc,
-                    ];
-                    $this->unitList[$maches[1]] = $unit;
-                }
-            }
-        } else {
-            echo 'not find' . PHP_EOL;
-        }
-    }
-
-    private function insertUnits()
-    {
-        parent::RedBeanConnect(self::DB_NAME);
-        R::freeze();
-        foreach ($this->unitList as $key => $unit) {
-            if (R::findOne(self::TB_NAME, 'original = ?', [$unit['original']]) ||
-                R::findOne(self::TB_NAME, 'linkgc = ?', [$unit['linkgc']])) {
-                unset($this->unitList[$key]);
-                continue;
-            }
-            $unitBean = R::dispense(self::TB_NAME);
-            $unitBean->import($unit);
-            R::store($unitBean);
-            unset($this->unitList[$key]);
-            $this->reply('Added ' . $unit['original']);
-        }
-        R::close();
-    }
     const TB_NAME_OAUTH = 'oauth';
-    const MAX_TOKENS    = 3;
+    const MAX_TOKENS = 3;
 
     public function generatePin()
     {
         parent::RedBeanConnect(self::DB_NAME);
-        $tokens   = R::find(self::TB_NAME_OAUTH);
+        $tokens = R::find(self::TB_NAME_OAUTH);
         $response = (count($tokens) >= self::MAX_TOKENS) ? $this->trashOrReturnPin() : $this->createPin();
         $this->message($response, $this->bot->getUserNick(), IRC::NOTICE);
         R::close();
@@ -210,8 +271,8 @@ class Aigis extends \Library\Module
     {
         $tokens = R::find(self::TB_NAME_OAUTH, 'ORDER BY time ASC');
         foreach ($tokens as $token) {
-            if (($timeleft = $this->checkTokenTime($token->time))) {
-                return sprintf("Here your pin: '%s'. Token lifetime left:  %s", $token->pin, $timeleft);
+            if (($timeLeft = $this->checkTokenTime($token->time))) {
+                return sprintf("Here your pin: '%s'. Token lifetime left:  %s", $token->pin, $timeLeft);
             } else {
                 R::trash($token);
             }
@@ -221,9 +282,9 @@ class Aigis extends \Library\Module
 
     private function createPin()
     {
-        $token        = R::dispense(self::TB_NAME_OAUTH);
-        $token->time  = time() + (60 * 60);
-        $token->pin   = substr(md5(sha1(uniqid(time()))), 0, 8);
+        $token = R::dispense(self::TB_NAME_OAUTH);
+        $token->time = time() + (60 * 60);
+        $token->pin = substr(md5(sha1(uniqid(time()))), 0, 8);
         $token->token = md5(sha1(uniqid(time())));
         R::store($token);
         return "Here your pin: '{$token->pin}'";

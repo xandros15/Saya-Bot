@@ -1,8 +1,8 @@
 <?php
 
-namespace Library\Chatter;
+namespace library\Chatter;
 
-use Library\Configuration as Config;
+use library\Configuration as Config;
 
 class Textline
 {

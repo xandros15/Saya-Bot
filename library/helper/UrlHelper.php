@@ -1,6 +1,6 @@
 <?php
 
-namespace Library\Helper;
+namespace library\helper;
 
 class UrlHelper
 {

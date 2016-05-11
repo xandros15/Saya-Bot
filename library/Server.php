@@ -1,14 +1,15 @@
 <?php
 
-namespace Library;
+namespace library;
 
-use Library\Chatter\Textline;
-use Library\Chatter\MessageRelay;
-use Library\Connection\Socket;
-use Library\Helper\ServerHelper;
-use Library\Debugger\Logger;
+use library\chatter\Textline;
+use library\chatter\MessageRelay;
+use library\connection\Socket;
+use library\helper\ServerHelper;
+use library\debugger\Logger;
+use library\botInterface\ServerController;
 
-class Server implements BotInterface\ServerController
+class Server implements ServerController
 {
     /** @var int */
     public $maxReconnects = 10;

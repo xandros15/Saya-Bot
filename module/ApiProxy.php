@@ -1,8 +1,10 @@
 <?php
 
-namespace Module;
+namespace module;
 
-class ApiProxy extends \Library\Module
+use library\Module;
+
+class ApiProxy extends Module
 {
     const
         URL_API = 'api.touhou.pl/external',
