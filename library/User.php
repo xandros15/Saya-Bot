@@ -3,7 +3,6 @@
 namespace library;
 
 use library\Constants\IRC;
-use library\Server;
 
 class User
 {
@@ -177,11 +176,7 @@ class User
      */
     public function mode($nameOrChan, $flags, array $args)
     {
-        if (is_array($args)) {
-            $args = implode(' ', $args);
-        }
-
-        $data = sprintf('MODE %s %s %s', $nameOrChan, $flags, $args);
+        $data = sprintf('MODE %s %s %s', $nameOrChan, $flags, implode(' ', $args));
 
         return $this->server->sendData($data);
     }
