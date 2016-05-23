@@ -17,8 +17,9 @@ class ColorTricks extends Color
      */
     public function rainbow(string $input) : self
     {
-        /** w/o white, black, normal, silver and grey, because these are not colors */  
-        $colorList = array_diff(array_flip($this->getColor()), ['white', 'black', 'normal', 'silver', 'grey']);
+        $colorList = array_flip($this->getColorList());
+        /** w/o white, black, normal, silver and grey, because these are not colors */
+        $colorList = array_diff($colorList, ['white', 'black', 'normal', 'silver', 'grey']);
         shuffle($colorList);
 
         foreach (str_split($input) as $char) {

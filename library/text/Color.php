@@ -40,12 +40,11 @@ class Color implements Format
     }
 
     /**
-     * @param string $name
-     * @return array|string
+     * @return array
      */
-    protected function getColor($name = '')
+    protected function getColorList() : array
     {
-        $colorList = [
+        return [
             'white' => 0,
             'black' => 1,
             'navy' => 2,
@@ -64,11 +63,20 @@ class Color implements Format
             'silver' => 15,
             'normal' => 16
         ];
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    protected function getColor(string $name)
+    {
+        $colorList = $this->getColorList();
 
         if ($name && !isset($colorList[$name])) {
             throw new InvalidColorException("Color {$name} doesn't exist.");
         }
 
-        return ($name) ? mb_substr('0' . $colorList[$name], -2) : $colorList;
+        return mb_substr('0' . $colorList[$name], -2);
     }
 }
