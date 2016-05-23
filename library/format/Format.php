@@ -19,6 +19,12 @@ Interface Format
     const RESET = "\x0F";
 
     /**
+     * Format constructor.
+     * @param string $input
+     */
+    public function __construct(string $input);
+
+    /**
      * @return string
      */
     public function __toString() : string;

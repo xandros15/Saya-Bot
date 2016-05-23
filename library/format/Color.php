@@ -10,23 +10,36 @@ namespace library\format;
 
 class Color implements Format
 {
-
     /**
      * @var string
      */
-    protected $output;
+    protected $formatted;
+
+    /**
+     * @var string;
+     */
+    protected $original;
+
+    /**
+     * Format constructor.
+     * @param string $input
+     */
+    public function __construct(string $input)
+    {
+        $this->original = $this->formatted = $input;
+    }
 
     /**
      * @return string
      */
     public function __toString() : string
     {
-        return $this->output;
+        return $this->formatted;
     }
 
-    public function toColor(string $input, string $color, string $background = '') : self
+    public function toColor(string $color, string $background = '') : self
     {
-        $this->output .= $this->getPrefix($color, $background) . $input . $this->getSuffix();
+        $this->formatted = $this->getPrefix($color, $background) . $this->formatted . $this->getSuffix();
 
         return $this;
     }
