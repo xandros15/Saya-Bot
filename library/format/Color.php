@@ -24,6 +24,13 @@ class Color implements Format
         return $this->output;
     }
 
+    public function toColor(string $input, string $color, string $background = '') : self
+    {
+        $this->output .= $this->getPrefix($color, $background) . $input . $this->getSuffix();
+        
+        return $this;
+    }
+
     /**
      * @param string $color
      * @param string $background
