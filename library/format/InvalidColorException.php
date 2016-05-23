@@ -6,7 +6,7 @@
  * Time: 01:34
  */
 
-namespace library\text;
+namespace library\format;
 
 
 use InvalidArgumentException;

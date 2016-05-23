@@ -6,7 +6,7 @@
  * Time: 13:09
  */
 
-namespace library\text;
+namespace library\format;
 
 
 class ColorTricks extends Color

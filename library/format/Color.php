@@ -6,7 +6,7 @@
  * Time: 17:01
  */
 
-namespace library\text;
+namespace library\format;
 
 class Color implements Format
 {

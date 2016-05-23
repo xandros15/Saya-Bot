@@ -6,7 +6,7 @@
  * Time: 01:11
  */
 
-namespace library\text;
+namespace library\format;
 
 
 Interface Format
