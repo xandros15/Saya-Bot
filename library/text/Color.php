@@ -40,6 +40,14 @@ class Color implements Format
     }
 
     /**
+     * @return string
+     */
+    protected function getSuffix(): string
+    {
+        return $this->getPrefix('normal', 'normal');
+    }
+
+    /**
      * @return array
      */
     protected function getColorList() : array
