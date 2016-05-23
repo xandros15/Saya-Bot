@@ -11,12 +11,12 @@ namespace library\text;
 
 Interface Format
 {
-    const PREFIX_BOLD = "\x02";
-    const PREFIX_COLOR = "\x03";
-    const PREFIX_ITALIC = "\x1D";
-    const PREFIX_UNDERLINE = "\x1F";
-    const PREFIX_REVERSE = "\x16";
-    const SUFFIX = "\x0F";
+    const BOLD = "\x02";
+    const COLOR = "\x03";
+    const ITALIC = "\x1D";
+    const UNDERLINE = "\x1F";
+    const REVERSE = "\x16";
+    const RESET = "\x0F";
 
     /**
      * @return string

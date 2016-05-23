@@ -35,7 +35,7 @@ class ColorTricks extends Color
 
             $this->output .= $this->getPrefix($color) . $char;
         }
-        $this->output .= self::SUFFIX;
+        $this->output .= self::RESET;
 
         return $this;
     }

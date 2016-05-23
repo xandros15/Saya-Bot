@@ -31,7 +31,7 @@ class Color implements Format
      */
     protected function getPrefix(string $color, string $background = '') : string
     {
-        $prefix = self::PREFIX_COLOR . $this->getColor($color);
+        $prefix = self::COLOR . $this->getColor($color);
         if ($background) {
             $prefix .= ',' . $this->getColor($background);
         }
