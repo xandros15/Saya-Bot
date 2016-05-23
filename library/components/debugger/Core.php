@@ -5,7 +5,7 @@ namespace library\Debugger;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use library\debugger\Logger;
+use library\debugger\LoggerInterface;
 
 class Core
 {
@@ -116,10 +116,10 @@ class Core
         $prefix = $this->getTimestamp();
 
         switch ($type) {
-            case Logger::ERROR: return $prefix .= ' (!ERROR): ';
-            case Logger::WARNING: return $prefix .= ' (WARNING): ';
-            case Logger::INFO: return $prefix .= ' (INFO): ';
-            case Logger::SUCCESS: return $prefix .= ' (SUCCESS): ';
+            case LoggerInterface::ERROR: return $prefix .= ' (!ERROR): ';
+            case LoggerInterface::WARNING: return $prefix .= ' (WARNING): ';
+            case LoggerInterface::INFO: return $prefix .= ' (INFO): ';
+            case LoggerInterface::SUCCESS: return $prefix .= ' (SUCCESS): ';
         }
     }
 

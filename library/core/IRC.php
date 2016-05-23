@@ -223,6 +223,6 @@ class IRC
         ErrNoOperHost = 491, // :No O-lines for your host
         ErrUModeUnknownFlag = 501, // :Unknown MODE flag
         ErrUsersDontMatch = 502, // :Cant change mode for other users
-        ErrSilenceListFull = 511;                   // <mask> :Your silence list is full                                                UNDERNET/DALNET
+        ErrSilenceListFull = 511;// <mask> :Your silence list is full                                                UNDERNET/DALNET
 
 }

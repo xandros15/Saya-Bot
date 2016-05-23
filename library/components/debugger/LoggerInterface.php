@@ -2,7 +2,7 @@
 
 namespace library\BotInterface;
 
-interface Logger
+interface LoggerInterface
 {
 
     public static function add($message, $type);

@@ -3,10 +3,10 @@
 namespace library\Debugger;
 
 use library\debugger\Core;
-use library\botInterface\Logger as LoggerInterface;
+use library\botInterface\LoggerInterface as LoggerInterface;
 use Exception;
 
-class Logger extends Core implements LoggerInterface
+class LoggerInterface extends Core implements LoggerInterface
 {
 
     public static function add($message, $type = self::INFO)

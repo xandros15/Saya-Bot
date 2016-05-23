@@ -7,7 +7,7 @@ use library\chatter\Textline;
 use library\chatter\MessageRelay;
 use library\connection\Socket;
 use library\helper\ServerHelper;
-use library\debugger\Logger;
+use library\debugger\LoggerInterface;
 use library\botInterface\ServerController;
 
 class Server implements ServerController
@@ -184,7 +184,7 @@ class Server implements ServerController
             sleep(1 + $this->maxReconnects - $try);
         }
 
-        Logger::add("Can't connect to {$this->host}:{$this->ports}", Logger::ERROR);
+        LoggerInterface::add("Can't connect to {$this->host}:{$this->ports}", LoggerInterface::ERROR);
 
         return false;
     }
