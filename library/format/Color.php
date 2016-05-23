@@ -29,7 +29,7 @@ class Color implements Format
      * @param string $background
      * @return string
      */
-    protected function getPrefix(string $color, string $background = '') : string
+    public function getPrefix(string $color, string $background = '') : string
     {
         $prefix = self::COLOR . $this->getColor($color);
         if ($background) {
@@ -42,7 +42,7 @@ class Color implements Format
     /**
      * @return string
      */
-    protected function getSuffix(): string
+    public function getSuffix(): string
     {
         return $this->getPrefix('normal', 'normal');
     }
@@ -50,7 +50,7 @@ class Color implements Format
     /**
      * @return array
      */
-    protected function getColorList() : array
+    public function getColorList() : array
     {
         return [
             'white' => 0,
@@ -77,7 +77,7 @@ class Color implements Format
      * @param string $name
      * @return string
      */
-    protected function getColor(string $name)
+    public function getColor(string $name)
     {
         $colorList = $this->getColorList();
 
