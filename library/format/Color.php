@@ -70,7 +70,7 @@ class Color implements Format
     /**
      * @return array
      */
-    protected function getColorList() : array
+    final protected function getColorList() : array
     {
         return [
             'white' => 0,
