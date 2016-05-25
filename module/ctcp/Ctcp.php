@@ -1,18 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: xandros15
- * Date: 2016-05-11
- * Time: 15:59
- */
 
-namespace module;
+namespace Ctcp;
 
-
-use library\Bot;
-use library\Configuration;
-use library\Constants\IRC;
-use library\Module;
+use Saya\Core\Bot;
+use Saya\Configuration\Configuration;
+use Saya\IRC;
+use Saya\Client\Module;
 
 class Ctcp extends Module
 {

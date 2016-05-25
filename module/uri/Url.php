@@ -4,11 +4,11 @@
 namespace Module;
 
 use DOMXPath;
-use library\constants\IRC;
-use library\helper\IRCHelper;
-use library\helper\UrlHelper;
+use Saya\IRC;
+use Saya\Components\Helper\IRCHelper;
+use Saya\Client\UrlHelper;
 use RuntimeException;
-use library\Module;
+use Saya\Client\Module;
 
 /**
  *
@@ -16,7 +16,7 @@ use library\Module;
  * @subpackage Listener
  * @author Remigiusz Guszkiewicz
  */
-class Url extends \Library\Module
+class Url extends Module
 {
     const
         TYPE_PAGE = 1,
@@ -28,19 +28,19 @@ class Url extends \Library\Module
 
     private
         $ctxDomainList = [
-            'http://t.co/' => [], //twitter
-            'https://t.co/' => [] //twitter
-            ],
-        $except        = [
+        'http://t.co/' => [], //twitter
+        'https://t.co/' => [] //twitter
+    ],
+        $except = [
 //'touhou.pl' => 'block',
-            'myanimelist.net' => 'block',
-            'mega.co.nz' => 'block',
-            'mega.nz' => 'block',
-            'anidb.net' => 'pass'
-            ],
-        $openGraph     = [
-            'kwejk.pl' => 'title',
-            'twitch.tv' => 'description'
+        'myanimelist.net' => 'block',
+        'mega.co.nz' => 'block',
+        'mega.nz' => 'block',
+        'anidb.net' => 'pass'
+    ],
+        $openGraph = [
+        'kwejk.pl' => 'title',
+        'twitch.tv' => 'description'
     ];
 
     public function __construct()
@@ -51,7 +51,11 @@ class Url extends \Library\Module
 
     public static function getRegexUrl()
     {
-        return '_^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS';
+        return '_^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254' .
+        '(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|' .
+        '2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x' .
+        '{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}' .
+        '0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS';
     }
 
     /**
@@ -70,7 +74,7 @@ class Url extends \Library\Module
                 continue;
             }
             $openGraph = $this->getOpenGraph($url);
-            $title     = $this->getTitle($url, $openGraph);
+            $title = $this->getTitle($url, $openGraph);
             if (!$title) {
                 continue;
             }
@@ -79,10 +83,11 @@ class Url extends \Library\Module
             $this->reply($title);
         }
     }
+
     private function trimtext($text, $lenght)
     {
-        if(strlen($text) > $lenght){
-           return mb_substr($text, 0, $lenght - 5) . '(...)';
+        if (strlen($text) > $lenght) {
+            return mb_substr($text, 0, $lenght - 5) . '(...)';
         }
         return $text;
     }
@@ -136,8 +141,8 @@ class Url extends \Library\Module
 
     protected function humanFilesize($bytes, $decimals = 2)
     {
-        $size   = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
+        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $factor = (int) floor((strlen($bytes) - 1) / 3);
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
     }
 
@@ -192,7 +197,7 @@ class Url extends \Library\Module
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', (isset($charset)) ? $charset : 'UTF-8');
         try {
 
-            $doc    = $this->getDOM();
+            $doc = $this->getDOM();
             $loaded = $doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
             /* $doc->loadHTML('<?xml encoding="' . (isset($charset) ? $charset : 'utf-8') . '" ?>' . $html); */
 
@@ -201,17 +206,18 @@ class Url extends \Library\Module
             if (!$loaded) {
                 if (preg_match("#<title[^>]*>(.*?)</title>#Umsi", $html, $matches)) {//Umsi
                     return $this->text(html_entity_decode(
-                                preg_replace('/\s+/', ' ', $matches[1])
-                            ), self::TYPE_PAGE);
+                        preg_replace('/\s+/', ' ', $matches[1])
+                    ), self::TYPE_PAGE);
                 }
                 throw new RuntimeException(libxml_get_last_error()->message);
             }
 
             if ($openGraph) {
                 $metadata = (new DOMXPath($doc))->query(self::OPEN_GRAPH_QUERY);
+                /** @var $meta \DOMNode */
                 foreach ($metadata as $meta) {
-                    $property          = $meta->getAttribute('property');
-                    $content           = $meta->getAttribute('content');
+                    $property = $meta->getAttribute('property');
+                    $content = $meta->getAttribute('content');
                     $rmetas[$property] = $content;
                 }
                 if (isset($rmetas['og:' . $openGraph])) {
