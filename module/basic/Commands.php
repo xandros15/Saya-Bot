@@ -2,7 +2,7 @@
 
 namespace Basic;
 
-use Saya\Client\Module;
+use Saya\Core\Client\Module;
 
 class Commands extends Module
 {
