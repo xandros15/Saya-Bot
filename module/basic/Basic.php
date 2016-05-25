@@ -2,8 +2,6 @@
 
 namespace Basic;
 
-
-
 use Saya\Core\Client\Module;
 use Saya\Core\Configuration\Configuration as Config;
 use Saya\Core\IRC;
