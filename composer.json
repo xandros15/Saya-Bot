@@ -12,7 +12,8 @@
     "minimum-stability": "dev",
     "autoload":{
         "psr-4":{
-            "Saya\\" : "library/"
+            "Saya\\" : "library/",
+            "":"module/"
         }
     },
     "require": {
