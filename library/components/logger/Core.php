@@ -8,12 +8,6 @@ use Exception;
 
 class Core
 {
-    const
-        ERROR = 1,
-        WARNING = 2,
-        INFO = 3,
-        SUCCESS = 4;
-
     /** @var string */
     protected $timezoneName = 'UTC';
 
@@ -42,7 +36,7 @@ class Core
 
     }
 
-    public static function add($message, $type = self::INFO)
+    public static function add($message, $type = Logger::INFO)
     {
         if (!self::$logger) {
             throw new Exception('No configured logger');
