@@ -2,9 +2,9 @@
 
 namespace Basic;
 
-use Saya\IRC;
-use Saya\Configuration\Configuration as Config;
-use Saya\Client\Module;
+use Saya\Core\IRC;
+use Saya\Core\Configuration\Configuration as Config;
+use Saya\Core\Client\Module;
 
 class Chatlog extends Module
 {
