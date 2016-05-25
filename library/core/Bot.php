@@ -1,33 +1,38 @@
 <?php
 
-namespace library;
+namespace Saya\Core;
 
-use library\Module;
-use library\Server;
-use library\Configuration as Config;
-use library\Filter;
-use library\constants\IRC;
+use Saya\Core\Client\Module;
+use Saya\Core\Client\User;
+use Saya\Core\Connection\Server;
+use Saya\Core\Input\Textline;
+use Saya\Core\Configuration\Configuration as Config;
+use Saya\Components\Filter;
 use ReflectionClass;
 use Exception;
-use library\debugger\LoggerInterface;
-
-/* Interfaces */
+use Saya\Components\Logger\Logger;
 
 class Bot
 {
     public
         $channelList = [],
-        /** @var \Library\Module */
+        /**
+         * @var Module
+         */
         $module = [];
     private
-        $buffer = [],
-        /** @var \Library\Chatter\Textline */
-        $chat = null,
-        $messageToSend = 0,
-        $timeLastSend = 0,
-        /** @var \Library\Server */
-        $server,
-        $numberOfReconnects = 0;
+        $buffer = [];
+        /**
+         * @var Textline
+         */
+    private $chat;
+    private $messageToSend = 0;
+    private $timeLastSend = 0;
+        /**
+         * @var Server
+         */
+    private $server;
+    private $numberOfReconnects = 0;
 
     public function connectToServer()
     {
@@ -112,7 +117,7 @@ class Bot
                     $message = IRC::PONG . ' ' . $text;
                     break;
                 default:
-                    return;
+                    return false;
             }
             if (strlen($message) > 508) {
                 $lastWhiteSpace = strrpos(substr($message, 0, 508), ' ');
@@ -128,6 +133,7 @@ class Bot
         while ($prio && $this->buffer) {
             $this->flushBuffer();
         }
+        return true;
     }
 
     public function getMask()
@@ -212,11 +218,12 @@ class Bot
 
     private function loadModule(array $module)
     {
-        $namespace = 'module';
+        $namespace = 'basic';
         $user = new User($this->server);
 
         foreach ($module as $moduleName) {
-            LoggerInterface::add('load ' . $moduleName . ' module', LoggerInterface::INFO); //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
+            Logger::add('load ' . $moduleName . ' module',
+                Logger::INFO); //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
             $reflector = new ReflectionClass("{$namespace}\\{$moduleName}");
             $instance = $reflector->newInstance();
             $name = $reflector->getShortName();
@@ -227,7 +234,7 @@ class Bot
             $this->module[$name]->setIRCBot($this);
             $this->module[$name]->setUser($user);
             $this->module[$name]->loadSettings();
-            echo LoggerInterface::add('done', LoggerInterface::INFO);
+            echo Logger::add('done', Logger::INFO);
         }
     }
 
@@ -265,7 +272,7 @@ class Bot
     private function setupBot()
     {
         (new Config())->simpleConfiguration();
-        LoggerInterface::setLogger('debug.log', '.', Config::DEFAULT_TIMEZONE);
+        Logger::setLogger('debug.log', '.', Config::DEFAULT_TIMEZONE);
         $server = new Server();
         $server->getTextline();
         $server->setHost(Config::$server);

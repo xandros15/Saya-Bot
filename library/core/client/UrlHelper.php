@@ -1,6 +1,6 @@
 <?php
 
-namespace library\helper;
+namespace Saya\Core\Client;
 
 class UrlHelper
 {

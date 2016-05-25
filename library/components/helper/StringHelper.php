@@ -6,8 +6,7 @@
  * Time: 03:09
  */
 
-namespace library\helper;
-
+namespace Saya\Components\Helper;
 
 class StringHelper
 {

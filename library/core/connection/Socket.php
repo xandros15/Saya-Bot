@@ -1,10 +1,8 @@
 <?php
 
-namespace library\Connection;
+namespace Saya\Core\Connection;
 
-use library\botInterface\Connection;
-
-class Socket implements Connection
+class Socket implements SocketInterface
 {
     const DEFAULT_TIMEOUT = 60 * 5; //5min
 

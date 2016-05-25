@@ -6,7 +6,7 @@
  * Time: 18:34
  */
 
-namespace library\format;
+namespace Saya\Components\Format;
 
 
 class TextParser extends Text

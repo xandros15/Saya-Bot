@@ -1,16 +1,14 @@
 <?php
 
-namespace library;
+namespace Saya\Core\Connection;
 
 use Exception;
-use library\chatter\Textline;
-use library\chatter\MessageRelay;
-use library\connection\Socket;
-use library\helper\ServerHelper;
-use library\debugger\LoggerInterface;
-use library\botInterface\ServerController;
+use Saya\Core\Input\Textline;
+use Saya\Core\Input\MessageRelay;
+use Saya\Components\Helper\ServerHelper;
+use Saya\Components\Logger\Logger;
 
-class Server implements ServerController
+class Server implements ServerInterface
 {
     /** @var int */
     public $maxReconnects = 10;
@@ -50,7 +48,7 @@ class Server implements ServerController
      * set name of server
      *
      * @param type $name
-     * @return \Library\Server
+     * @return \Saya\Server
      */
     public function setName($name)
     {
@@ -62,7 +60,7 @@ class Server implements ServerController
      * set host of server
      *
      * @param type $host
-     * @return \Library\Server
+     * @return \Saya\Server
      */
     public function setHost($host)
     {
@@ -74,7 +72,7 @@ class Server implements ServerController
      * set ports of server connections
      *
      * @param type $ports
-     * @return \Library\Server
+     * @return \Saya\Server
      */
     public function setPorts($ports)
     {
@@ -184,7 +182,7 @@ class Server implements ServerController
             sleep(1 + $this->maxReconnects - $try);
         }
 
-        LoggerInterface::add("Can't connect to {$this->host}:{$this->ports}", LoggerInterface::ERROR);
+        Logger::add("Can't connect to {$this->host}:{$this->ports}", Logger::ERROR);
 
         return false;
     }

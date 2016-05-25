@@ -1,8 +1,8 @@
 <?php
 
-namespace library;
+namespace Saya\Components;
 
-use library\helper\IRCHelper;
+use Saya\Components\Helper\IRCHelper;
 use Symfony\Component\Process\Process;
 
 class Filter

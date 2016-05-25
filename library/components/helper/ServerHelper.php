@@ -1,12 +1,11 @@
 <?php
 
-namespace library\helper;
+namespace Saya\Components\Helper;
 
 use Exception;
 
 class ServerHelper
 {
-
     /**
      * @param string $ports
      * @return array

@@ -1,6 +1,6 @@
 <?php
 
-namespace library;
+namespace Saya\Components;
 
 use ReflectionFunction;
 use SplFileObject;

@@ -6,7 +6,7 @@
  * Time: 17:01
  */
 
-namespace library\format;
+namespace Saya\Components\Format;
 
 class Color implements Format
 {

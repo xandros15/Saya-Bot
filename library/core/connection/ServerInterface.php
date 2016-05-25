@@ -1,10 +1,9 @@
 <?php
 
-namespace library\botInterface;
+namespace Saya\Core\Connection;
 
-interface ServerController
+interface ServerInterface
 {
-
     public function connect();
 
     public function disconnect();

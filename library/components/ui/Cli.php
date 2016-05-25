@@ -1,7 +1,7 @@
 <?php
 
 
-namespace library\Ui;
+namespace Saya\Components\Ui;
 
 
 class Cli

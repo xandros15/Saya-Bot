@@ -1,7 +1,7 @@
 <?php
 
 
-namespace library;
+namespace Saya\Core\Client;
 
 class Channel
 {

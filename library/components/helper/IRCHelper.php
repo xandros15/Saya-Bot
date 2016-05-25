@@ -1,6 +1,6 @@
 <?php
 
-namespace library\helper;
+namespace Saya\Components\Helper;
 
 /* @todo
  * change colors method

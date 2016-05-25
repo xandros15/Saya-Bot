@@ -6,7 +6,7 @@
  * Time: 17:05
  */
 
-namespace library\format;
+namespace Saya\Components\Format;
 
 
 class Text implements Format

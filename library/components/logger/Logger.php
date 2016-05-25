@@ -1,14 +1,11 @@
 <?php
 
-namespace library\Debugger;
+namespace Saya\Components\Logger;
 
-use library\debugger\Core;
-use library\botInterface\LoggerInterface as LoggerInterface;
 use Exception;
 
-class LoggerInterface extends Core implements LoggerInterface
+class Logger extends Core implements LoggerInterface
 {
-
     public static function add($message, $type = self::INFO)
     {
         parent::add($message, $type);

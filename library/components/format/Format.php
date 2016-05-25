@@ -6,7 +6,7 @@
  * Time: 01:11
  */
 
-namespace library\format;
+namespace Saya\Components\Format;
 
 
 Interface Format

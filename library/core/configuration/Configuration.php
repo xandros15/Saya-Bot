@@ -1,6 +1,6 @@
 <?php
 
-namespace library;
+namespace Saya\Core\Configuration;
 
 class Configuration
 {

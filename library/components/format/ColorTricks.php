@@ -6,7 +6,7 @@
  * Time: 13:09
  */
 
-namespace library\format;
+namespace Saya\Components\Format;
 
 
 class ColorTricks extends Color

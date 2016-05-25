@@ -1,6 +1,6 @@
 <?php
 
-namespace library\Constants;
+namespace Saya\Core;
 
 class IRC
 {

@@ -6,7 +6,7 @@
  * Time: 13:08
  */
 
-namespace library\format;
+namespace Saya\Components\Format;
 
 
 class ColorParser extends Color

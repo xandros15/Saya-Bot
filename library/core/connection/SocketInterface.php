@@ -1,8 +1,8 @@
 <?php
 
-namespace library\BotInterface;
+namespace Saya\Core\Connection;
 
-interface Connection
+interface SocketInterface
 {
     public function getHost();
 

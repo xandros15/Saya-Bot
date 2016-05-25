@@ -1,11 +1,10 @@
 <?php
 
-namespace library\Debugger;
+namespace Saya\Components\Logger;
 
 use DateTime;
 use DateTimeZone;
 use Exception;
-use library\debugger\LoggerInterface;
 
 class Core
 {
@@ -104,9 +103,9 @@ class Core
 
     protected function setDatetime($timezoneName = 'UTC')
     {
-        $timezone           = new DateTimeZone($timezoneName);
-        $datetime           = new DateTime('now', $timezone);
-        $this->datetime     = $datetime;
+        $timezone = new DateTimeZone($timezoneName);
+        $datetime = new DateTime('now', $timezone);
+        $this->datetime = $datetime;
         $this->timezoneName = $timezoneName;
         return $this;
     }
@@ -116,10 +115,14 @@ class Core
         $prefix = $this->getTimestamp();
 
         switch ($type) {
-            case LoggerInterface::ERROR: return $prefix .= ' (!ERROR): ';
-            case LoggerInterface::WARNING: return $prefix .= ' (WARNING): ';
-            case LoggerInterface::INFO: return $prefix .= ' (INFO): ';
-            case LoggerInterface::SUCCESS: return $prefix .= ' (SUCCESS): ';
+            case LoggerInterface::ERROR:
+                return $prefix .= ' (!ERROR): ';
+            case LoggerInterface::WARNING:
+                return $prefix .= ' (WARNING): ';
+            case LoggerInterface::INFO:
+                return $prefix .= ' (INFO): ';
+            case LoggerInterface::SUCCESS:
+                return $prefix .= ' (SUCCESS): ';
         }
     }
 
@@ -132,8 +135,8 @@ class Core
         } elseif (!is_writable($file)) {
             throw new Exception("{$file}: write: permission denied");
         }
-        $fileinfo       = pathinfo($file);
-        $this->ext      = $fileinfo['extension'];
+        $fileinfo = pathinfo($file);
+        $this->ext = $fileinfo['extension'];
         $this->filename = $fileinfo['filename'];
         return $this;
     }

@@ -1,16 +1,16 @@
 <?php
 
-namespace library;
+namespace Saya\Core\Client;
 
 use Closure;
 use DOMDocument;
 use Exception;
-use library\Bot;
-use library\helper\UrlHelper;
-use library\FunctionHash;
-use library\Configuration as Config;
-use library\constants\IRC;
-use R;
+use Saya\Core\Bot;
+use Saya\Core\Client\UrlHelper;
+use Saya\Components\FunctionHash;
+use Saya\Core\Configuration\Configuration as Config;
+use Saya\Core\IRC;
+use RedBeanPHP\R;
 use ReflectionClass;
 
 abstract class Module
@@ -28,12 +28,13 @@ abstract class Module
 
 
     /**
-     * @var \library\Bot
+     * @var Bot
      */
-    protected $bot = null;
+    protected $bot;
     /**
      * @var User
      */
+    protected $ctx;
     protected $user;
     protected $commands = [];
     protected $executeTime = [];
@@ -432,7 +433,6 @@ abstract class Module
      */
     protected static function RedBeanConnect($dbname, $frozen = true)
     {
-        require_once(implode(DIRECTORY_SEPARATOR, [ROOT_DIR, 'library', 'database', 'rb.php']));
         if (isset(R::$toolboxes[$dbname])) {
             R::selectDatabase($dbname);
         } else {

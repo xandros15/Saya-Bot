@@ -1,8 +1,9 @@
 <?php
 
-namespace library;
+namespace Saya\Core\Client;
 
-use library\Constants\IRC;
+use Saya\Core\Connection\ServerInterface;
+use Saya\Core\IRC;
 
 class User
 {
@@ -15,10 +16,10 @@ class User
     /** @var string */
     public $mask;
 
-    /** @var Server */
+    /** @var ServerInterface */
     protected $server;
 
-    public function __construct(Server $server)
+    public function __construct(ServerInterface $server)
     {
         $this->server = $server;
     }
@@ -42,19 +43,11 @@ class User
      * same as say, just reply message
      *
      * @param int $message
-     * @param string $type
      * @return int
      */
-    public function reply($message, $type = IRC::PRIVMSG)
+    public function reply($message)
     {
-        switch ($type) {
-            case IRC::PRIVMSG:
-                $this->say($this->server->getTextline()->getSource(), $message);
-                return;
-            case IRC::NOTICE:
-                $this->notice($this->server->getTextline()->getSource(), $message);
-                return;
-        }
+        return $this->say($this->server->getTextline()->getSource(), $message);
     }
 
     /**

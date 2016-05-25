@@ -1,6 +1,6 @@
 <?php
 
-namespace library\Chatter;
+namespace Saya\Core\Input;
 
 class MessageRelay
 {

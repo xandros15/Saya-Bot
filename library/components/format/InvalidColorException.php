@@ -6,7 +6,7 @@
  * Time: 01:34
  */
 
-namespace library\format;
+namespace Saya\Components\Format;
 
 
 use InvalidArgumentException;

@@ -1,8 +1,8 @@
 <?php
 
-namespace library\Chatter;
+namespace Saya\Core\Input;
 
-use library\Configuration as Config;
+use Saya\Core\Configuration\Configuration as Config;
 
 class Textline
 {
