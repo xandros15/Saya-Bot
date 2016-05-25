@@ -47,8 +47,8 @@ class Server implements ServerInterface
     /**
      * set name of server
      *
-     * @param type $name
-     * @return \Saya\Server
+     * @param string $name
+     * @return Server
      */
     public function setName($name)
     {
@@ -59,8 +59,8 @@ class Server implements ServerInterface
     /**
      * set host of server
      *
-     * @param type $host
-     * @return \Saya\Server
+     * @param string $host
+     * @return Server
      */
     public function setHost($host)
     {
@@ -71,8 +71,8 @@ class Server implements ServerInterface
     /**
      * set ports of server connections
      *
-     * @param type $ports
-     * @return \Saya\Server
+     * @param string $ports
+     * @return Server
      */
     public function setPorts($ports)
     {
