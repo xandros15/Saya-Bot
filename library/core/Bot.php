@@ -22,15 +22,15 @@ class Bot
         $module = [];
     private
         $buffer = [];
-        /**
-         * @var Textline
-         */
+    /**
+     * @var Textline
+     */
     private $chat;
     private $messageToSend = 0;
     private $timeLastSend = 0;
-        /**
-         * @var Server
-         */
+    /**
+     * @var Server
+     */
     private $server;
     private $numberOfReconnects = 0;
 
@@ -218,22 +218,21 @@ class Bot
 
     private function loadModule(array $module)
     {
-        $namespace = 'basic';
         $user = new User($this->server);
 
         foreach ($module as $moduleName) {
-            Logger::add('load ' . $moduleName . ' module',
-                Logger::INFO); //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
-            $reflector = new ReflectionClass("{$namespace}\\{$moduleName}");
+            Logger::add('load ' . $moduleName . ' module', Logger::INFO);
+            //fwrite(STDOUT ,'load ' . $moduleName . ' module... ');
+            $reflector = new ReflectionClass($moduleName);
             $instance = $reflector->newInstance();
-            $name = $reflector->getShortName();
+//            $name = $reflector->getShortName();
             if (!$instance instanceof Module) {
                 throw new Exception();
             }
-            $this->module[$name] = $instance;
-            $this->module[$name]->setIRCBot($this);
-            $this->module[$name]->setUser($user);
-            $this->module[$name]->loadSettings();
+            $this->module[$moduleName] = $instance;
+            $this->module[$moduleName]->setIRCBot($this);
+            $this->module[$moduleName]->setUser($user);
+            $this->module[$moduleName]->loadSettings();
             echo Logger::add('done', Logger::INFO);
         }
     }
@@ -274,10 +273,9 @@ class Bot
         (new Config())->simpleConfiguration();
         Logger::setLogger('debug.log', '.', Config::DEFAULT_TIMEZONE);
         $server = new Server();
-        $server->getTextline();
+        $this->chat = $server->getTextline();
         $server->setHost(Config::$server);
         $server->setPorts(Config::$port);
-        $this->chat = $server->getTextline();
         $this->server = $server;
         $this->loadModule(Config::$modules);
         if (!$server->connect()) {
