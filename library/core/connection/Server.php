@@ -148,6 +148,9 @@ class Server implements ServerInterface
      */
     public function sendData($data)
     {
+        if(DEBUG){
+            echo Logger::add($data, Logger::INFO);
+        }
         return $this->connection->sendData($data . IRC_EOL);
     }
 
@@ -225,7 +228,9 @@ class Server implements ServerInterface
         if (!$message) {
             return false;
         }
-
+        if(DEBUG){
+            echo Logger::add($message, Logger::INFO);
+        }
         $this->messageRelay->setMessage($message);
 
         return $this->textline->update();
