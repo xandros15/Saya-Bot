@@ -3,9 +3,10 @@
 namespace Saya\Core;
 
 use Saya\Core\Client\Module;
-use Saya\Core\Client\User;
+use Saya\Core\Input\MessageInterface;
+use Saya\Core\Output\Request;
 use Saya\Core\Connection\Server;
-use Saya\Core\Input\Textline;
+use Saya\Core\Input\Message;
 use Saya\Core\Configuration\Configuration as Config;
 use Saya\Components\Filter;
 use ReflectionClass;
@@ -23,7 +24,7 @@ class Bot
     private
         $buffer = [];
     /**
-     * @var Textline
+     * @var MessageInterface
      */
     private $chat;
     private $messageToSend = 0;
@@ -138,12 +139,12 @@ class Bot
 
     public function getMask()
     {
-        return $this->chat->getUser();
+        return $this->chat->getMask();
     }
 
     public function getType()
     {
-        return $this->chat->getType();
+        return $this->chat->getCommand();
     }
 
     public function getSource()
@@ -153,7 +154,7 @@ class Bot
 
     public function getOffset()
     {
-        return $this->chat->getOffset();
+        return $this->chat->getParams();
     }
 
     public function getMessage()
@@ -273,7 +274,7 @@ class Bot
         (new Config())->simpleConfiguration();
         Logger::setLogger('debug.log', '.', Config::DEFAULT_TIMEZONE);
         $server = new Server();
-        $this->chat = $server->getTextline();
+        $this->chat = $server->getTextline()->getMessage();
         $server->setHost(Config::$server);
         $server->setPorts(Config::$port);
         $this->server = $server;
