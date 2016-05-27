@@ -5,7 +5,7 @@ namespace Saya\Core;
 use Saya\Core\Client\Module;
 use Saya\Core\Input\MessageInterface;
 use Saya\Core\Output\Request;
-use Saya\Core\Connection\Server;
+use Saya\Core\Server\Server;
 use Saya\Core\Input\Message;
 use Saya\Core\Configuration\Configuration as Config;
 use Saya\Components\Filter;

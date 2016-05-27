@@ -1,6 +1,6 @@
 <?php
 
-namespace Saya\Core\Connection;
+namespace Saya\Core\Server;
 
 interface ServerInterface
 {

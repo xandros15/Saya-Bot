@@ -2,8 +2,8 @@
 
 namespace Saya\Core\Output;
 
-use Saya\Core\Connection\ServerInfo;
-use Saya\Core\Connection\ServerInterface;
+use Saya\Core\Server\ServerInfo;
+use Saya\Core\Server\ServerInterface;
 use Saya\Core\Input\Input;
 use Saya\Core\Input\MessageInterface;
 use Saya\Core\IRC;

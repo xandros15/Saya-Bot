@@ -1,8 +1,9 @@
 <?php
 
-namespace Saya\Core\Connection;
+namespace Saya\Core\Server;
 
 use Exception;
+use Saya\Core\Connection\Socket;
 use Saya\Core\Input\Textline;
 use Saya\Core\Input\Input;
 use Saya\Components\Helper\ServerHelper;

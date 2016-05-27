@@ -6,7 +6,7 @@
  * Time: 17:54
  */
 
-namespace Saya\Core\Connection;
+namespace Saya\Core\Server;
 
 
 interface ServerInfo
