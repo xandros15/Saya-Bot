@@ -1,27 +1,27 @@
 <?php
 
-namespace Saya\Core\Client;
+namespace Saya\Core\Output;
 
+use Saya\Core\Connection\ServerInfo;
 use Saya\Core\Connection\ServerInterface;
+use Saya\Core\Input\Input;
+use Saya\Core\Input\MessageInterface;
 use Saya\Core\IRC;
 
-class User
+class Request implements RequestInterface
 {
-    /** @var string */
-    public $name;
-
-    /** @var string */
-    public $nickname;
-
-    /** @var string */
-    public $mask;
-
+    /** @var  */
+    protected $buffer;
     /** @var ServerInterface */
     protected $server;
+    /** @var $message */
+    protected $message;
 
-    public function __construct(ServerInterface $server)
+    public function __construct(ServerInfo $server, MessageInterface $message, $buffer = null)
     {
         $this->server = $server;
+        $this->buffer = $buffer;
+        $this->message = $message;
     }
 
     /**
@@ -47,7 +47,7 @@ class User
      */
     public function reply($message)
     {
-        return $this->say($this->server->getTextline()->getSource(), $message);
+        return $this->say($this->message->getSource(), $message);
     }
 
     /**
@@ -73,7 +73,7 @@ class User
      */
     public function replyNotice($message)
     {
-        return $this->notice($this->server->getTextline()->getSource(), $message);
+        return $this->notice($this->message->getSource(), $message);
     }
 
     /**
