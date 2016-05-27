@@ -245,7 +245,7 @@ class Bot
                 if (!empty($this->buffer)) {
                     $this->flushBuffer();
                 }
-                if (!$this->server->loadData()) {
+                if (!$this->server->update()) {
                     if ($this->channelList) {
                         Module::executeListener();
                     }

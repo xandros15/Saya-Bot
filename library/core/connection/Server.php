@@ -4,11 +4,13 @@ namespace Saya\Core\Connection;
 
 use Exception;
 use Saya\Core\Input\Textline;
-use Saya\Core\Input\MessageRelay;
+use Saya\Core\Input\Input;
 use Saya\Components\Helper\ServerHelper;
 use Saya\Components\Logger\Logger;
+use Saya\Core\Input\Updater;
+use Symfony\Component\Process\Exception\RuntimeException;
 
-class Server implements ServerInterface
+class Server implements ServerInterface, ServerInfo, Updater
 {
     /** @var int */
     public $maxReconnects = 10;
@@ -34,14 +36,10 @@ class Server implements ServerInterface
     /** @var Socket */
     private $connection;
 
-    /** @var MessageRelay */
-    private $messageRelay;
-
     public function __construct()
     {
-        $this->messageRelay = new MessageRelay();
-        $this->textline     = new Textline($this->messageRelay);
-        $this->connection   = new Socket();
+        $this->textline = new Textline();
+        $this->connection = new Socket();
     }
 
     /**
@@ -112,7 +110,7 @@ class Server implements ServerInterface
 
     /**
      * get current port
-     * 
+     *
      * @return int
      */
     public function getPort()
@@ -148,7 +146,7 @@ class Server implements ServerInterface
      */
     public function sendData($data)
     {
-        if(DEBUG){
+        if (DEBUG) {
             echo Logger::add($data, Logger::INFO);
         }
         return $this->connection->sendData($data . IRC_EOL);
@@ -216,9 +214,9 @@ class Server implements ServerInterface
      *
      * @return boolean
      */
-    public function loadData()
+    public function update()
     {
-        $data = $this->connection->getData();
+        $data = $this->connection->getData() ?? '';
         if (!$data) {
             return false;
         }
@@ -228,11 +226,15 @@ class Server implements ServerInterface
         if (!$message) {
             return false;
         }
-        if(DEBUG){
+        if (DEBUG) {
             echo Logger::add($message, Logger::INFO);
         }
-        $this->messageRelay->setMessage($message);
-
-        return $this->textline->update();
+        try {
+            $this->textline->update($message);
+        } catch (RuntimeException $error) {
+            Logger::add($error->getMessage(), Logger::ERROR);
+            return false;
+        }
+        return true;
     }
 }

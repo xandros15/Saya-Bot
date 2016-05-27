@@ -9,6 +9,4 @@ interface ServerInterface
     public function disconnect();
 
     public function isConnected();
-
-    public function loadData();
 }
