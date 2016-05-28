@@ -193,7 +193,7 @@ class Bot
             sleep(10 * $this->numberOfReconnects++);
             $this->connectToServer();
         }
-        if (($this->getType() == IRC::RplWelcome) && ($this->numberOfReconnects > 0)) {
+        if (($this->getType() == IRC::RPL_WELCOME) && ($this->numberOfReconnects > 0)) {
             $this->numberOfReconnects = 0;
         }
     }
