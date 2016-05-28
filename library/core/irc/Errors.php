@@ -33,7 +33,7 @@ interface Errors
         ERR_FILE_ERROR = 424,
         ERR_NO_NICKNAME_GIVEN = 431, // :No nickname given
         ERR_ERRONEOUS_NICKNAME = 432, // <nickname> :Erroneous Nickname
-        ERR_NICK_NAME_IN_USE = 433, // <nickname> :Nickname is already in use.
+        ERR_NICKNAME_IN_USE = 433, // <nickname> :Nickname is already in use.
         ERR_NICK_COLLISION = 436, // <nickname> :Nickname collision KILL
         ERR_UN_AVAIL_RESOURCE = 437, // <channel> :Cannot change nickname while banned on channel
         ERR_NICK_TOO_FAST = 438, // <nick> :Nick change too fast. Please wait <sec> seconds.                         (most)
