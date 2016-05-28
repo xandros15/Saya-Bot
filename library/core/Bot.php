@@ -18,7 +18,7 @@ class Bot
     public
         $channelList = [],
         /**
-         * @var Module
+         * @var $module Module
          */
         $module = [];
     private
@@ -219,7 +219,7 @@ class Bot
 
     private function loadModule(array $module)
     {
-        $user = new User($this->server);
+        $request = new Request($this->server, $this->chat);
 
         foreach ($module as $moduleName) {
             Logger::add('load ' . $moduleName . ' module', Logger::INFO);
@@ -232,7 +232,7 @@ class Bot
             }
             $this->module[$moduleName] = $instance;
             $this->module[$moduleName]->setIRCBot($this);
-            $this->module[$moduleName]->setUser($user);
+            $this->module[$moduleName]->setUser($request);
             $this->module[$moduleName]->loadSettings();
             echo Logger::add('done', Logger::INFO);
         }
