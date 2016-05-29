@@ -10,18 +10,12 @@ use Saya\Core\IRC;
 
 class Request implements RequestInterface
 {
-    /** @var  */
-    protected $buffer;
-    /** @var ServerInterface */
-    protected $server;
-    /** @var $message */
-    protected $message;
+    /** @var Sender */
+    protected $sender;
 
-    public function __construct(ServerInfo $server, MessageInterface $message, $buffer = null)
+    public function __construct(Sender $sender)
     {
-        $this->server = $server;
-        $this->buffer = $buffer;
-        $this->message = $message;
+        $this->sender = $sender;
     }
 
     /**
@@ -36,18 +30,19 @@ class Request implements RequestInterface
     {
         $data = sprintf('PRIVMSG %s :%s', $nameOrChan, $message);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
      * same as say, just reply message
      *
      * @param int $message
+     * @param MessageInterface $input
      * @return int
      */
-    public function reply($message)
+    public function reply($message, MessageInterface $input)
     {
-        return $this->say($this->message->getSource(), $message);
+        return $this->say($input->getSource(), $message);
     }
 
     /**
@@ -62,7 +57,7 @@ class Request implements RequestInterface
     {
         $data = sprintf('NOTICE %s :%s', $nameOrChan, $message);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -71,9 +66,9 @@ class Request implements RequestInterface
      * @param int $message
      * @return int
      */
-    public function replyNotice($message)
+    public function replyNotice($message, MessageInterface $input)
     {
-        return $this->notice($this->message->getSource(), $message);
+        return $this->notice($input->getSource(), $message);
     }
 
     /**
@@ -87,7 +82,7 @@ class Request implements RequestInterface
     {
         $data = sprintf('NICK %s', $nickname);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -105,7 +100,7 @@ class Request implements RequestInterface
 
         $data = sprintf('JOIN %s', $channel);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -124,7 +119,7 @@ class Request implements RequestInterface
 
         $data = sprintf('PART %s :%s', $channel, $message);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -138,7 +133,7 @@ class Request implements RequestInterface
     {
         $data = sprintf('QUIT :%s', $message);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -153,7 +148,7 @@ class Request implements RequestInterface
     {
         $data = sprintf('KICK %s %s :%s', $channel, $name, $message);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -171,7 +166,7 @@ class Request implements RequestInterface
     {
         $data = sprintf('MODE %s %s %s', $nameOrChan, $flags, implode(' ', $args));
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -187,7 +182,7 @@ class Request implements RequestInterface
 
         $data = sprintf('TOPIC %s %s', $channel, $topic);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -202,7 +197,7 @@ class Request implements RequestInterface
     {
         $data = sprintf('INVITE %s %s', $nickname, $channel);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -216,7 +211,7 @@ class Request implements RequestInterface
     {
         $data = sprintf('AWAY %s', $message);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 
     /**
@@ -226,12 +221,12 @@ class Request implements RequestInterface
      * @param string $message
      * @return int
      */
-    public function ping($message = '')
+    public function ping($message = '', ServerInfo $serverInfo)
     {
-        $message ?: sprintf('%s:%s', $this->server->getHost(), $this->server->getPort());
+        $message ?: sprintf('%s:%s', $serverInfo->getHost(), $serverInfo->getPort());
 
         $data = sprintf('PING %s', $message);
 
-        return $this->server->sendData($data);
+        return $this->sender->send($data);
     }
 }
