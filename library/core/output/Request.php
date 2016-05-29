@@ -34,18 +34,6 @@ class Request implements RequestInterface
     }
 
     /**
-     * same as say, just reply message
-     *
-     * @param int $message
-     * @param MessageInterface $input
-     * @return int
-     */
-    public function reply($message, MessageInterface $input)
-    {
-        return $this->say($input->getSource(), $message);
-    }
-
-    /**
      * sending notice to target
      * syntax: NOTICE <msgtarget> <message>
      *
@@ -58,17 +46,6 @@ class Request implements RequestInterface
         $data = sprintf('NOTICE %s :%s', $nameOrChan, $message);
 
         return $this->sender->send($data);
-    }
-
-    /**
-     * same as notice, just reply message
-     *
-     * @param int $message
-     * @return int
-     */
-    public function replyNotice($message, MessageInterface $input)
-    {
-        return $this->notice($input->getSource(), $message);
     }
 
     /**

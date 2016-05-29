@@ -22,14 +22,6 @@ interface RequestInterface
     public function say($nameOrChan, $message);
 
     /**
-     * same as say, just reply message
-     *
-     * @param int $message
-     * @return int
-     */
-    public function reply($message);
-
-    /**
      * sending notice to target
      * syntax: NOTICE <msgtarget> <message>
      *
@@ -38,14 +30,6 @@ interface RequestInterface
      * @return int
      */
     public function notice($nameOrChan, $message);
-
-    /**
-     * same as notice, just reply message
-     *
-     * @param int $message
-     * @return int
-     */
-    public function replyNotice($message);
 
     /**
      * change nickname
@@ -106,6 +90,7 @@ interface RequestInterface
      * @return int
      */
     public function mode($nameOrChan, $flags, array $args);
+
     /**
      * set topic of channel
      * syntax: TOPIC <channel> [<topic>]
@@ -115,6 +100,7 @@ interface RequestInterface
      * @return int
      */
     public function topic($channel, $topic);
+
     /**
      * Invite to channel
      * syntax: INVITE <nickname> <channel>
