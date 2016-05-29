@@ -14,6 +14,15 @@ use Saya\Core\Input\MessageInterface;
 class Reply extends Request
 {
     /**
+     * Reply constructor.
+     * @param Request $request
+     */
+    public function __construct(Request $request)
+    {
+        parent::__construct($request->sender);
+    }
+
+    /**
      * same as notice, just reply message
      *
      * @param $message
