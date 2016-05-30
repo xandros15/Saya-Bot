@@ -1,6 +1,6 @@
 <?php
 if (version_compare(PHP_VERSION, '5.4.0', '<')) {
-    die('Your php version is to low. This bot required minimum 5.4.0 php version.');
+    die('You\'re php version is to low. This bot have had required minimum 5.4.0 php version.');
 }
 
 chdir(__DIR__);
