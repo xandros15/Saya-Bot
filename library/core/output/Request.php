@@ -3,9 +3,6 @@
 namespace Saya\Core\Output;
 
 use Saya\Core\Server\ServerInfo;
-use Saya\Core\Server\ServerInterface;
-use Saya\Core\Input\Input;
-use Saya\Core\Input\MessageInterface;
 use Saya\Core\IRC;
 
 class Request implements RequestInterface
@@ -24,13 +21,12 @@ class Request implements RequestInterface
      *
      * @param string $nameOrChan
      * @param string $message
-     * @return int
      */
-    public function say($nameOrChan, $message)
+    public function say(string $nameOrChan, string $message)
     {
         $data = sprintf('PRIVMSG %s :%s', $nameOrChan, $message);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
@@ -39,13 +35,12 @@ class Request implements RequestInterface
      *
      * @param string $nameOrChan
      * @param string $message
-     * @return int
      */
-    public function notice($nameOrChan, $message)
+    public function notice(string $nameOrChan, string $message)
     {
         $data = sprintf('NOTICE %s :%s', $nameOrChan, $message);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
@@ -53,48 +48,38 @@ class Request implements RequestInterface
      * syntax: NICK <nickname>
      *
      * @param string $nickname
-     * @return int
      */
-    public function nick($nickname)
+    public function nick(string $nickname)
     {
         $data = sprintf('NICK %s', $nickname);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
      * join to channel
      * syntax: JOIN <channels> [<keys>]
      *
-     * @param string $channel
-     * @return int
+     * @param array $channel
      */
-    public function join($channel)
+    public function join(array $channel)
     {
-        if (is_array($channel)) {
-            $channel = explode(',', $channel);
-        }
 
-        $data = sprintf('JOIN %s', $channel);
+        $data = sprintf('JOIN %s', explode(',', $channel));
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
      * part from channel
      * syntax: PART <channels> [<message>]
      *
-     * @param string $channel
+     * @param array $channel
      * @param string $message
-     * @return int
      */
-    public function part($channel, $message = '')
+    public function part(array $channel, string $message = '')
     {
-        if (is_array($channel)) {
-            $channel = explode(',', $channel);
-        }
-
-        $data = sprintf('PART %s :%s', $channel, $message);
+        $data = sprintf('PART %s :%s', explode(',', $channel), $message);
 
         return $this->sender->send($data);
     }
@@ -104,28 +89,27 @@ class Request implements RequestInterface
      * syntax: QUIT [<message>]
      *
      * @param string $message
-     * @return int
      */
-    public function quit($message = '')
+    public function quit(string $message = '')
     {
         $data = sprintf('QUIT :%s', $message);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
      * kick from channel
      * syntax: KICK <channel> <client> [<message>]
      *
+     * @param string $channel
      * @param string $name
      * @param string $message
-     * @return int
      */
-    public function kick($channel, $name, $message = '')
+    public function kick(string $channel, string $name, string $message = '')
     {
         $data = sprintf('KICK %s %s :%s', $channel, $name, $message);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
@@ -137,13 +121,12 @@ class Request implements RequestInterface
      * @param string $nameOrChan
      * @param string $flags
      * @param array $args
-     * @return int
      */
-    public function mode($nameOrChan, $flags, array $args)
+    public function mode(string $nameOrChan, string $flags, array $args)
     {
         $data = sprintf('MODE %s %s %s', $nameOrChan, $flags, implode(' ', $args));
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
@@ -152,14 +135,13 @@ class Request implements RequestInterface
      *
      * @param string $channel
      * @param string $topic
-     * @return int
      */
-    public function topic($channel, $topic)
+    public function topic(string $channel, string $topic)
     {
 
         $data = sprintf('TOPIC %s %s', $channel, $topic);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
@@ -168,13 +150,12 @@ class Request implements RequestInterface
      *
      * @param string $nickname
      * @param string $channel
-     * @return int
      */
-    public function invite($nickname, $channel)
+    public function invite(string $nickname, string $channel)
     {
         $data = sprintf('INVITE %s %s', $nickname, $channel);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
@@ -182,28 +163,25 @@ class Request implements RequestInterface
      * syntax: AWAY [<message>]
      *
      * @param string $message
-     * @return int
      */
-    public function away($message)
+    public function away(string $message)
     {
         $data = sprintf('AWAY %s', $message);
 
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 
     /**
      * ping to server
      * syntax: PING <server1> [<server2>]
      *
+     * @param ServerInfo $serverInfo
      * @param string $message
-     * @return int
      */
-    public function ping($message = '', ServerInfo $serverInfo)
+    public function ping(ServerInfo $serverInfo, string $message = '')
     {
-        $message ?: sprintf('%s:%s', $serverInfo->getHost(), $serverInfo->getPort());
+        $data = sprintf('PING %s', $message ?: sprintf('%s:%s', $serverInfo->getHost(), $serverInfo->getPort()));
 
-        $data = sprintf('PING %s', $message);
-
-        return $this->sender->send($data);
+        $this->sender->send($data);
     }
 }
