@@ -5,7 +5,7 @@ namespace Library;
 class Configuration
 {
     const
-        APPLICATION_NAME = 'Saya Bot',
+        APPLICATION_NAME = 'Sayar Bot',
         DEFAULT_TIMEZONE = 'Europe/Warsaw';
 
     public static
