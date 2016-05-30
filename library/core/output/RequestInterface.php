@@ -9,6 +9,8 @@
 namespace Saya\Core\Output;
 
 
+use Saya\Core\Server\ServerInfo;
+
 interface RequestInterface
 {
     /**
@@ -17,9 +19,8 @@ interface RequestInterface
      *
      * @param string $nameOrChan
      * @param string $message
-     * @return int
      */
-    public function say($nameOrChan, $message);
+    public function say(string $nameOrChan, string $message);
 
     /**
      * sending notice to target
@@ -27,56 +28,51 @@ interface RequestInterface
      *
      * @param string $nameOrChan
      * @param string $message
-     * @return int
      */
-    public function notice($nameOrChan, $message);
+    public function notice(string $nameOrChan, string $message);
 
     /**
      * change nickname
      * syntax: NICK <nickname>
      *
      * @param string $nickname
-     * @return int
      */
-    public function nick($nickname);
+    public function nick(string $nickname);
 
     /**
      * join to channel
      * syntax: JOIN <channels> [<keys>]
      *
-     * @param string $channel
-     * @return int
+     * @param array $channel
      */
-    public function join($channel);
+    public function join(array $channel);
 
     /**
      * part from channel
      * syntax: PART <channels> [<message>]
      *
-     * @param string $channel
+     * @param array $channel
      * @param string $message
-     * @return int
      */
-    public function part($channel, $message = '');
+    public function part(array $channel, string $message = '');
 
     /**
      * quit from server
      * syntax: QUIT [<message>]
      *
      * @param string $message
-     * @return int
      */
-    public function quit($message = '');
+    public function quit(string $message = '');
 
     /**
      * kick from channel
      * syntax: KICK <channel> <client> [<message>]
      *
-     * @param string $name
+     * @param $channel
+     * @param $name
      * @param string $message
-     * @return int
      */
-    public function kick($channel, $name, $message = '');
+    public function kick(string $channel, string $name, string $message = '');
 
     /**
      * set mode
@@ -87,9 +83,8 @@ interface RequestInterface
      * @param string $nameOrChan
      * @param string $flags
      * @param array $args
-     * @return int
      */
-    public function mode($nameOrChan, $flags, array $args);
+    public function mode(string $nameOrChan, string $flags, array $args);
 
     /**
      * set topic of channel
@@ -97,9 +92,8 @@ interface RequestInterface
      *
      * @param string $channel
      * @param string $topic
-     * @return int
      */
-    public function topic($channel, $topic);
+    public function topic(string $channel, string $topic);
 
     /**
      * Invite to channel
@@ -107,25 +101,23 @@ interface RequestInterface
      *
      * @param string $nickname
      * @param string $channel
-     * @return int
      */
-    public function invite($nickname, $channel);
+    public function invite(string $nickname, string $channel);
 
     /**
      * set bot away on server
      * syntax: AWAY [<message>]
      *
      * @param string $message
-     * @return int
      */
-    public function away($message);
+    public function away(string $message);
 
     /**
      * ping to server
      * syntax: PING <server1> [<server2>]
      *
+     * @param ServerInfo $serverInfo
      * @param string $message
-     * @return int
      */
-    public function ping($message = '');
+    public function ping(ServerInfo $serverInfo, string $message = '');
 }
