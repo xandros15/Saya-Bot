@@ -20,4 +20,6 @@ interface TimeBuffer
      * @param float $time
      */
     public function changeDelayTime(float $time);
+
+    public function flushBuffer();
 }

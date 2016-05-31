@@ -10,9 +10,9 @@ namespace Saya\Core\Output\Buffer;
 
 
 use Saya\Core\Output\Sender;
-use SplPriorityQueue;
+use SplQueue;
 
-class Buffer extends SplPriorityQueue implements TimeBuffer, Sender
+class Buffer extends SplQueue implements TimeBuffer, Sender
 {
     protected $delayTime;
     protected $sender;
@@ -32,7 +32,7 @@ class Buffer extends SplPriorityQueue implements TimeBuffer, Sender
     /**
      * @return bool
      */
-    public function canSend()
+    public function canSend() : bool
     {
         return $this->delayTime < (microtime(true) - $this->timeLastSend);
     }
@@ -48,7 +48,7 @@ class Buffer extends SplPriorityQueue implements TimeBuffer, Sender
     public function flushBuffer()
     {
         while (!$this->isEmpty() && $this->canSend()) {
-            $this->sender->send($this->extract());
+            $this->sender->send($this->shift());
             $this->timeLastSend = microtime(true);
         }
     }
@@ -58,6 +58,6 @@ class Buffer extends SplPriorityQueue implements TimeBuffer, Sender
      */
     public function send(string $message)
     {
-        $this->insert($message, 1);
+        $this->push($message);
     }
 }

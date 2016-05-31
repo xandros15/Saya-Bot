@@ -21,14 +21,11 @@ class Bot
          * @var $module Module
          */
         $module = [];
-    private
-        $buffer = [];
     /**
      * @var MessageInterface
      */
     private $chat;
-    private $messageToSend = 0;
-    private $timeLastSend = 0;
+
     /**
      * @var Server
      */
@@ -50,90 +47,6 @@ class Bot
         }
         $this->sendDataToServer($login);
         $this->sendDataToServer($user);
-        return true;
-    }
-
-    public function fillBuffer($text, $type, $target = null, $prio = false)
-    {
-        $text = str_replace([chr(9), chr(10), chr(11), chr(13), chr(0)], '', $text);
-        $text = trim($text);
-        $filters = (new Filter())->filterList();
-        if ($type == IRC::PRIVMSG && $filters) {
-            foreach ($filters as $filter) {
-                if (isset($filter['serverBlock']) && in_array(Config::getServerName(), $filter['serverBlock'])) {
-                    continue;
-                }
-                if (isset($filter['serverAllow']) && !in_array(Config::getServerName(), $filter['serverAllow'])) {
-                    continue;
-                }
-                if (isset($filter['channelBlock']) && in_array($target, $filter['channelBlock'])) {
-                    continue;
-                }
-                if (isset($filter['channelAllow']) && !in_array($target, $filter['channelAllow'])) {
-                    continue;
-                }
-                if (is_callable($filter['callback'])) {
-                    $text = call_user_func($filter['callback'], $text);
-                }
-            }
-        }
-        if (!$text) {
-            echo 'You sent nothing' . PHP_EOL;
-            return false;
-        }
-        while (true) {
-            switch ($type) {
-                case IRC::PRIVMSG:
-                    $message = IRC::PRIVMSG . ' ' . $target . ' :' . $text;
-                    break;
-                case IRC::MODE:
-                    $message = IRC::MODE . ' ' . $target . ' ' . $text;
-                    break;
-                case IRC::NICK:
-                    $message = IRC::NICK . ' ' . $text;
-                    break;
-                case IRC::TOPIC:
-                    break;
-                case IRC::PART:
-                    $message = IRC::PART . ' ' . $target . ' :' . $text;
-                    break;
-                case IRC::QUIT:
-                    $message = IRC::QUIT . ' :' . $text;
-                    break;
-                case IRC::JOIN:
-                    $message = IRC::JOIN . ' ' . $text;
-                    break;
-                case IRC::KICK:
-                    $message = IRC::KICK . ' ' . $target . ' :' . $text;
-                    break;
-                case IRC::NOTICE:
-                    $message = IRC::NOTICE . ' ' . $target . ' :' . $text;
-                    break;
-                case IRC::INVITE:
-                    break;
-                case IRC::IDENTIFY:
-                    $message = IRC::IDENTIFY . ' ' . $text;
-                    break;
-                case IRC::PING:
-                    $message = IRC::PONG . ' ' . $text;
-                    break;
-                default:
-                    return false;
-            }
-            if (strlen($message) > 508) {
-                $lastWhiteSpace = strrpos(substr($message, 0, 508), ' ');
-                $position = ($lastWhiteSpace !== false) ? $lastWhiteSpace : strlen(substr($message, 0, 508));
-                $text = substr($message, $position + 1);
-                $this->buffer[] = substr($message, 0, $position);
-            } else {
-                $this->buffer[] = $message;
-                break;
-            }
-        }
-
-        while ($prio && $this->buffer) {
-            $this->flushBuffer();
-        }
         return true;
     }
 
@@ -195,25 +108,6 @@ class Bot
         }
         if (($this->getType() == IRC::RPL_WELCOME) && ($this->numberOfReconnects > 0)) {
             $this->numberOfReconnects = 0;
-        }
-    }
-
-    private function flushBuffer()
-    {
-        foreach ($this->buffer as $buffer) {
-            $time = Config::$timePerMessage - (time() - $this->timeLastSend);
-            $isTime = ($time > 0);
-            if ($isTime && $this->messageToSend == 0) {
-                break;
-            } elseif ($isTime && $this->messageToSend-- > 0) {
-                $this->sendDataToServer($buffer);
-                array_shift($this->buffer);
-            } elseif ($time <= 0) {
-                $this->sendDataToServer($buffer);
-                array_shift($this->buffer);
-                $this->messageToSend = Config::$messagePerTime - 1;
-                $this->timeLastSend = time();
-            }
         }
     }
 
