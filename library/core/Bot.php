@@ -160,7 +160,7 @@ class Bot
 
     private function sendDataToServer($data)
     {
-        $this->server->sendData($data);
+        $this->server->send($data);
     }
 
     private function setupBot()

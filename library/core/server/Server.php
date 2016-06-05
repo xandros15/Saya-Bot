@@ -9,9 +9,10 @@ use Saya\Core\Input\Input;
 use Saya\Components\Helper\ServerHelper;
 use Saya\Components\Logger\Logger;
 use Saya\Core\Input\Updater;
+use Saya\Core\Output\Sender;
 use Symfony\Component\Process\Exception\RuntimeException;
 
-class Server implements ServerInterface, ServerInfo, Updater
+class Server implements ServerInterface, ServerInfo, Updater, Sender
 {
     /** @var int */
     public $maxReconnects = 10;
@@ -145,12 +146,12 @@ class Server implements ServerInterface, ServerInfo, Updater
      * @param string $data
      * @return int
      */
-    public function sendData($data)
+    public function send(string $data)
     {
         if (DEBUG) {
             echo Logger::add($data, Logger::INFO);
         }
-        return $this->connection->sendData($data . IRC_EOL);
+        $this->connection->sendData($data . IRC_EOL);
     }
 
     /**
